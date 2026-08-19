@@ -1,4 +1,9 @@
+
 name: Quantum Bot Research
+
+
+permissions:
+  contents: write
 
 on:
 
