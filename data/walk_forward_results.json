@@ -10,13 +10,13 @@
       "tp_multiplier": 6.741
     },
     "metrics": {
-      "trades": 0,
-      "profit_factor": 0.0,
-      "drawdown": 0.0016,
-      "profit_percent": 0.0
+      "trades": 3,
+      "profit_factor": 0.8741012457187873,
+      "drawdown": 0.0016208754499999715,
+      "profit_percent": -0.020406619999999997
     },
     "active": false,
-    "updated_at": "2026-08-19T20:52:24.411322+00:00"
+    "updated_at": "2026-08-19T21:18:08.754645+00:00"
   },
   "BTC/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -29,13 +29,13 @@
       "tp_multiplier": 7.686
     },
     "metrics": {
-      "trades": 0,
-      "profit_factor": 0.0,
-      "drawdown": 0.002,
-      "profit_percent": 0.0
+      "trades": 6,
+      "profit_factor": 1.1228911311581466,
+      "drawdown": 0.001963732840000034,
+      "profit_percent": 0.02413253500000001
     },
     "active": false,
-    "updated_at": "2026-08-19T20:52:33.245004+00:00"
+    "updated_at": "2026-08-19T21:18:18.514392+00:00"
   },
   "SOL/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -54,7 +54,7 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T20:52:41.759425+00:00"
+    "updated_at": "2026-08-19T21:18:28.081442+00:00"
   },
   "XRP/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -73,7 +73,7 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T20:52:50.246512+00:00"
+    "updated_at": "2026-08-19T21:18:37.610136+00:00"
   },
   "BTW/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -86,12 +86,12 @@
       "tp_multiplier": 4.921
     },
     "metrics": {
-      "trades": 0,
-      "profit_factor": 0.0,
-      "drawdown": 0.0365,
-      "profit_percent": 0.0
+      "trades": 9,
+      "profit_factor": 1.4662209244841458,
+      "drawdown": 0.03647837179860962,
+      "profit_percent": 1.8265913090000003
     },
-    "active": false,
-    "updated_at": "2026-08-19T20:52:59.967803+00:00"
+    "active": true,
+    "updated_at": "2026-08-19T21:18:48.312618+00:00"
   }
 }
