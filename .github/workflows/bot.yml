@@ -3,11 +3,12 @@ name: Kripto Bot 7/24
 on:
   schedule:
     - cron: '*/5 * * * *' # Her 5 dakikada bir çalıştırır
-  workflow_dispatch: # İstersen elden de tetikleyebilirsin
+  workflow_dispatch: # Manuel olarak da çalıştırabilirsin
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
     steps:
       - name: Kodları Depodan Çek
         uses: actions/checkout@v4
@@ -24,18 +25,23 @@ jobs:
 
       - name: Botu Çalıştır
         env:
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FREQTRADE__TELEGRAM__TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          FREQTRADE__TELEGRAM__CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          # Eğer user_data klasörü yoksa sıfırdan oluşturur
+          # Eğer user_data klasörü yoksa sıfırdan oluştur
           if [ ! -d "user_data" ]; then
             freqtrade create-userdir --userdir user_data
           fi
-          
-          # Gerekli alt klasörleri garantiye al ve dosyaları yerleştir
+
+          # Gerekli klasörleri oluştur
           mkdir -p user_data/strategies user_data/configs
+
+          # Strateji ve config dosyalarını kopyala
           cp QuantumMomentumStrategy.py user_data/strategies/
           cp config.json user_data/configs/
-          
-          # Botu başlat
-          freqtrade trade --strategy QuantumMomentumStrategy --config user_data/configs/config.json --userdir user_data
+
+          # Freqtrade botunu başlat
+          freqtrade trade \
+            --strategy QuantumMomentumStrategy \
+            --config user_data/configs/config.json \
+            --userdir user_data
