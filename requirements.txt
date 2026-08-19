@@ -1,3 +1,5 @@
 freqtrade
 pandas
 pandas-ta
+ccxt
+python-telegram-bot
