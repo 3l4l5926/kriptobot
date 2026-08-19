@@ -69,8 +69,8 @@ jobs:
             --config config.json \
             --trading-mode futures \
             --timeframes 15m \
-            --days 130 \
-            --new-pairs-days 130
+            --timerange 20260521-20260819 \
+            --pairs ETH/USDT:USDT BTC/USDT:USDT SOL/USDT:USDT XRP/USDT:USDT BTW/USDT:USDT
 
       - name: Optimize
         run: |
