@@ -1,0 +1,3 @@
+freqtrade
+pandas
+pandas-ta
