@@ -6,10 +6,16 @@ from pathlib import Path
 
 
 CONFIG = "config.json"
-STRATEGY = "QuantumMomentumStrategy"
 
-CANDIDATE_FILE = Path("data/candidate_pairs.json")
-PARAM_FILE = Path("data/pair_params.json")
+BASE_STRATEGY = "QuantumMomentumStrategy"
+
+CANDIDATE_FILE = Path(
+    "data/candidate_pairs.json"
+)
+
+PARAM_FILE = Path(
+    "data/pair_params.json"
+)
 
 RESULT_FILE = Path(
     "data/walk_forward_results.json"
@@ -27,7 +33,6 @@ TEMP_STRATEGY = (
     STRATEGY_DIR /
     "PairSpecificStrategy.py"
 )
-
 
 TRAIN_DAYS = 90
 TEST_DAYS = 30
@@ -165,6 +170,14 @@ class PairSpecificStrategy(
         default={float(params["tp_multiplier"])},
         space="sell"
     )
+
+    minimal_roi = {{
+        "0": 100.0
+    }}
+
+    stoploss = -0.99
+
+    use_custom_stoploss = False
 '''
 
     with open(
@@ -189,6 +202,7 @@ def run_backtest(
     command = [
 
         "freqtrade",
+
         "backtesting",
 
         "--config",
@@ -207,7 +221,7 @@ def run_backtest(
         timerange,
 
         "--export",
-        "trades",
+        "signals",
 
         "--cache",
         "none",
@@ -215,6 +229,24 @@ def run_backtest(
         "--backtest-directory",
         "data/backtests"
     ]
+
+    print("")
+    print(
+        "BACKTEST:",
+        pair
+    )
+
+    print(
+        "TIMERANGE:",
+        timerange
+    )
+
+    print(
+        "PARAMS:",
+        json.dumps(
+            params
+        )
+    )
 
     result = subprocess.run(
         command,
@@ -224,18 +256,20 @@ def run_backtest(
 
     output = (
         result.stdout
-        + "\n"
-        + result.stderr
+        +
+        "\n"
+        +
+        result.stderr
     )
 
     print(
-        output[-8000:]
+        output[-12000:]
     )
 
     if result.returncode != 0:
 
         raise RuntimeError(
-            f"OOS backtest başarısız: {pair}"
+            f"Backtest başarısız: {pair}"
         )
 
     return output
@@ -244,23 +278,26 @@ def run_backtest(
 def parse_metrics(output):
 
     metrics = {
+
         "trades": 0,
+
         "profit_factor": 0.0,
+
         "drawdown": 0.0,
+
         "profit_percent": 0.0
     }
 
-    patterns = [
+    trade_patterns = [
 
         r"Total\s+trades\s*\|\s*(\d+)",
 
         r"Total\s+trades\s*[:|]\s*(\d+)",
 
         r"(\d+)\s+trades"
-
     ]
 
-    for pattern in patterns:
+    for pattern in trade_patterns:
 
         match = re.search(
             pattern,
@@ -277,15 +314,14 @@ def parse_metrics(output):
             break
 
 
-    patterns = [
+    pf_patterns = [
 
         r"Profit\s*Factor\s*\|\s*([0-9.]+)",
 
         r"Profit\s*Factor\s*[:|]\s*([0-9.]+)"
-
     ]
 
-    for pattern in patterns:
+    for pattern in pf_patterns:
 
         match = re.search(
             pattern,
@@ -302,15 +338,14 @@ def parse_metrics(output):
             break
 
 
-    patterns = [
+    profit_patterns = [
 
         r"Tot\s+Profit\s*%\s*\|\s*(-?[0-9.]+)",
 
         r"Tot\s+Profit\s*%\s*[:|]\s*(-?[0-9.]+)"
-
     ]
 
-    for pattern in patterns:
+    for pattern in profit_patterns:
 
         match = re.search(
             pattern,
@@ -327,15 +362,14 @@ def parse_metrics(output):
             break
 
 
-    patterns = [
+    dd_patterns = [
 
         r"Drawdown.*?\|\s*(-?[0-9.]+)\s*%",
 
         r"Drawdown.*?(-?[0-9.]+)\s*%"
-
     ]
 
-    for pattern in patterns:
+    for pattern in dd_patterns:
 
         match = re.search(
             pattern,
@@ -346,11 +380,14 @@ def parse_metrics(output):
         if match:
 
             metrics["drawdown"] = (
+
                 abs(
                     float(
                         match.group(1)
                     )
-                ) / 100
+                )
+
+                / 100.0
             )
 
             break
@@ -362,23 +399,27 @@ def is_good(metrics):
 
     return (
 
-        metrics["trades"] >= MIN_TRADES
+        metrics["trades"]
+        >=
+        MIN_TRADES
 
         and
 
         metrics["profit_factor"]
-        >= MIN_PROFIT_FACTOR
+        >=
+        MIN_PROFIT_FACTOR
 
         and
 
         metrics["drawdown"]
-        <= MAX_DRAWDOWN
+        <=
+        MAX_DRAWDOWN
 
         and
 
         metrics["profit_percent"]
-        > 0
-
+        >
+        0
     )
 
 
@@ -411,24 +452,42 @@ def main():
         {}
     )
 
+    if not pairs:
+
+        raise RuntimeError(
+            "candidate_pairs.json boş!"
+        )
+
+    if not pair_params:
+
+        raise RuntimeError(
+            "pair_params.json boş!"
+        )
+
     results = {}
-    active = []
+
+    active_pairs = []
 
     print("")
     print("=" * 70)
-    print("WALK FORWARD")
-    print("=" * 70)
 
     print(
-        f"TRAIN : {train_range}"
+        "WALK FORWARD TEST"
     )
 
     print(
-        f"TEST  : {test_range}"
+        "TRAIN:",
+        train_range
     )
 
     print(
-        f"COINS : {len(pairs)}"
+        "TEST:",
+        test_range
+    )
+
+    print(
+        "PAIRS:",
+        len(pairs)
     )
 
     print("=" * 70)
@@ -443,7 +502,7 @@ def main():
         if not params:
 
             print(
-                f"⚠️ {pair}: "
+                f"SKIP {pair}: "
                 "parametre yok."
             )
 
@@ -490,25 +549,69 @@ def main():
 
             if good:
 
-                active.append(
+                active_pairs.append(
                     pair
                 )
 
             print("")
             print(
-                f"{pair}: "
-                f"TRADES={metrics['trades']} "
-                f"PF={metrics['profit_factor']} "
-                f"PROFIT={metrics['profit_percent']}% "
-                f"DD={metrics['drawdown']:.2%} "
-                f"ACTIVE={good}"
+                "RESULT:",
+                pair
+            )
+
+            print(
+                "TRADES:",
+                metrics["trades"]
+            )
+
+            print(
+                "PF:",
+                metrics["profit_factor"]
+            )
+
+            print(
+                "PROFIT:",
+                metrics["profit_percent"]
+            )
+
+            print(
+                "DD:",
+                metrics["drawdown"]
+            )
+
+            print(
+                "ACTIVE:",
+                good
             )
 
         except Exception as e:
 
             print(
-                f"❌ {pair}: {e}"
+                f"ERROR {pair}: {e}"
             )
+
+            results[pair] = {
+
+                "train_timerange":
+                    train_range,
+
+                "test_timerange":
+                    test_range,
+
+                "params":
+                    params,
+
+                "error":
+                    str(e),
+
+                "active":
+                    False,
+
+                "updated_at":
+                    datetime.now(
+                        timezone.utc
+                    ).isoformat()
+            }
 
 
     save_json(
@@ -519,8 +622,13 @@ def main():
     save_json(
         ACTIVE_FILE,
         {
-            "pairs": active,
-            "count": len(active),
+
+            "pairs":
+                active_pairs,
+
+            "count":
+                len(active_pairs),
+
             "updated_at":
                 datetime.now(
                     timezone.utc
@@ -536,15 +644,19 @@ def main():
 
     print("")
     print("=" * 70)
+
     print(
-        f"ACTIVE COINS: {len(active)}"
+        "ACTIVE COINS:",
+        len(active_pairs)
     )
+
     print("=" * 70)
 
-    for pair in active:
+    for pair in active_pairs:
 
         print(
-            f"✅ {pair}"
+            "ACTIVE:",
+            pair
         )
 
 
