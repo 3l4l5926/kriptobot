@@ -17,25 +17,13 @@ jobs:
 
     steps:
 
-      # =====================================================
-      # REPOSITORY
-      # =====================================================
-
       - name: Repository
         uses: actions/checkout@v4
-
-      # =====================================================
-      # PYTHON
-      # =====================================================
 
       - name: Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-
-      # =====================================================
-      # INSTALL
-      # =====================================================
 
       - name: Install
         run: |
@@ -46,20 +34,13 @@ jobs:
 
           pip install "freqtrade[hyperopt]"
 
-          python -c "import filelock; print('filelock OK')"
-
           freqtrade --version
-
-      # =====================================================
-      # DIRECTORIES
-      # =====================================================
 
       - name: Create directories
         run: |
 
           mkdir -p data
           mkdir -p data/backtests
-
           mkdir -p user_data
           mkdir -p user_data/strategies
           mkdir -p user_data/configs
@@ -71,21 +52,16 @@ jobs:
           cp config.json \
              user_data/configs/
 
-      # =====================================================
-      # DATES
-      #
-      # TRAIN = 90 DAYS
-      # TEST  = 30 DAYS
-      # TOTAL = 120 DAYS
-      # =====================================================
-
       - name: Calculate dates
-        shell: bash
         run: |
 
           python - <<'PY'
 
-          from datetime import datetime, timedelta, timezone
+          from datetime import (
+              datetime,
+              timedelta,
+              timezone
+          )
 
           today = datetime.now(
               timezone.utc
@@ -103,7 +79,10 @@ jobs:
               timedelta(days=90)
           )
 
-          with open("dates.env", "w") as f:
+          with open(
+              "dates.env",
+              "w"
+          ) as f:
 
               f.write(
                   "TRAIN_START="
@@ -124,39 +103,72 @@ jobs:
               )
 
           print(
-              "TRAIN :",
-              train_start.strftime("%Y%m%d"),
+              "TRAIN:",
+              train_start,
               "-",
-              test_start.strftime("%Y%m%d")
+              test_start
           )
 
           print(
-              "TEST  :",
-              test_start.strftime("%Y%m%d"),
+              "TEST:",
+              test_start,
               "-",
-              test_end.strftime("%Y%m%d")
+              test_end
           )
 
           PY
 
           cat dates.env
 
-      # =====================================================
-      # SCAN
-      # =====================================================
-
       - name: Scan
         run: |
 
           python scanner.py
 
-      # =====================================================
-      # DOWNLOAD FUTURES DATA
-      #
-      # 120 günü tek seferde istemiyoruz.
-      #
-      # 30 + 30 + 30 + 30 şeklinde indiriyoruz.
-      # =====================================================
+      - name: Build pair list
+        run: |
+
+          python - <<'PY'
+
+          import json
+
+          with open(
+              "data/candidate_pairs.json",
+              "r",
+              encoding="utf-8"
+          ) as f:
+
+              data = json.load(f)
+
+          pairs = data.get(
+              "pairs",
+              []
+          )
+
+          if not pairs:
+
+              raise SystemExit(
+                  "candidate_pairs.json boş!"
+              )
+
+          print(
+              f"{len(pairs)} coin bulundu."
+          )
+
+          with open(
+              "pairs.txt",
+              "w"
+          ) as f:
+
+              for pair in pairs:
+
+                  f.write(
+                      pair + "\n"
+                  )
+
+          PY
+
+          cat pairs.txt
 
       - name: Download futures data
         shell: bash
@@ -164,15 +176,27 @@ jobs:
 
           source dates.env
 
-          export TRAIN_START
-          export TEST_END
-
           python - <<'PY'
 
-          import os
+          import json
           import subprocess
+          import os
 
-          from datetime import datetime, timedelta
+          from datetime import (
+              datetime,
+              timedelta
+          )
+
+
+          with open(
+              "data/candidate_pairs.json",
+              "r",
+              encoding="utf-8"
+          ) as f:
+
+              pairs = json.load(
+                  f
+              )["pairs"]
 
 
           train_start = datetime.strptime(
@@ -184,15 +208,6 @@ jobs:
               os.environ["TEST_END"],
               "%Y%m%d"
           )
-
-
-          pairs = [
-              "ETH/USDT:USDT",
-              "BTC/USDT:USDT",
-              "SOL/USDT:USDT",
-              "XRP/USDT:USDT",
-              "BTW/USDT:USDT"
-          ]
 
 
           current = train_start
@@ -210,32 +225,24 @@ jobs:
                   next_date = test_end
 
 
-              start = current.strftime(
-                  "%Y%m%d"
-              )
-
-              end = next_date.strftime(
-                  "%Y%m%d"
-              )
-
-
               timerange = (
-                  start +
-                  "-" +
-                  end
+                  current.strftime("%Y%m%d")
+                  + "-"
+                  + next_date.strftime("%Y%m%d")
               )
 
 
               print("")
               print("=" * 70)
               print(
-                  "DOWNLOADING:",
+                  "DOWNLOAD:",
                   timerange
               )
               print("=" * 70)
 
 
               command = [
+
                   "freqtrade",
                   "download-data",
 
@@ -260,11 +267,6 @@ jobs:
               )
 
 
-              print(
-                  " ".join(command)
-              )
-
-
               result = subprocess.run(
                   command
               )
@@ -273,7 +275,7 @@ jobs:
               if result.returncode != 0:
 
                   raise SystemExit(
-                      "Futures data download failed."
+                      "Data download failed."
                   )
 
 
@@ -281,67 +283,28 @@ jobs:
 
           PY
 
-      # =====================================================
-      # VERIFY DATA
-      # =====================================================
-
       - name: Verify data
-        shell: bash
         run: |
-
-          echo ""
-          echo "=========================================="
-          echo "DOWNLOADED DATA"
-          echo "=========================================="
 
           find user_data/data \
             -type f \
             | head -100
 
-      # =====================================================
-      # OPTIMIZATION
-      #
-      # SADECE 90 GÜNLÜK TRAIN VERİSİ
-      #
-      # TEST VERİSİ HYPEROPT'A VERİLMEZ.
-      # =====================================================
-
       - name: Optimize
-        shell: bash
         run: |
 
           source dates.env
 
-          echo ""
-          echo "=========================================="
-          echo "HYPEROPT"
-          echo "=========================================="
-
-          echo "TRAIN:"
-          echo "${TRAIN_START}-${TEST_START}"
-
           python optimizer.py \
             --timerange \
             "${TRAIN_START}-${TEST_START}"
-
-      # =====================================================
-      # WALK FORWARD TEST
-      #
-      # OPTIMIZER PARAMETRELERİ
-      # SONRAKİ 30 GÜNDE TEST EDİLİR.
-      # =====================================================
 
       - name: Walk Forward Test
         run: |
 
           python walk_forward.py
 
-      # =====================================================
-      # LOOKAHEAD ANALYSIS
-      # =====================================================
-
       - name: Lookahead check
-        shell: bash
         run: |
 
           source dates.env
@@ -355,67 +318,28 @@ jobs:
             --minimum-trade-amount 10 \
             || true
 
-      # =====================================================
-      # SHOW RESULTS
-      # =====================================================
-
       - name: Show results
-        shell: bash
         run: |
 
-          echo ""
-          echo "=========================================="
-          echo "PAIR PARAMETERS"
-          echo "=========================================="
+          echo "=============================="
+          echo "PAIR PARAMS"
+          echo "=============================="
 
-          if [ -f data/pair_params.json ]; then
+          cat data/pair_params.json || true
 
-            cat data/pair_params.json
+          echo "=============================="
+          echo "WALK FORWARD"
+          echo "=============================="
 
-          else
+          cat data/walk_forward_results.json || true
 
-            echo "pair_params.json bulunamadı."
-
-          fi
-
-
-          echo ""
-          echo "=========================================="
-          echo "WALK FORWARD RESULTS"
-          echo "=========================================="
-
-          if [ -f data/walk_forward_results.json ]; then
-
-            cat data/walk_forward_results.json
-
-          else
-
-            echo "walk_forward_results.json bulunamadı."
-
-          fi
-
-
-          echo ""
-          echo "=========================================="
+          echo "=============================="
           echo "ACTIVE PAIRS"
-          echo "=========================================="
+          echo "=============================="
 
-          if [ -f data/active_pairs.json ]; then
-
-            cat data/active_pairs.json
-
-          else
-
-            echo "active_pairs.json bulunamadı."
-
-          fi
-
-      # =====================================================
-      # SAVE RESULTS
-      # =====================================================
+          cat data/active_pairs.json || true
 
       - name: Save results
-        shell: bash
         run: |
 
           git config user.name \
