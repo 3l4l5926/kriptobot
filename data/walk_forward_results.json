@@ -3,95 +3,95 @@
     "train_timerange": "20260421-20260720",
     "test_timerange": "20260720-20260819",
     "params": {
-      "buy_rsi": 45,
-      "short_rsi": 55,
-      "trend_adx": 30,
-      "sl_multiplier": 2.2,
-      "tp_multiplier": 5.0
+      "buy_rsi": 40,
+      "short_rsi": 53,
+      "trend_adx": 35,
+      "sl_multiplier": 1.84,
+      "tp_multiplier": 2.923
     },
     "metrics": {
       "trades": 0,
-      "profit_factor": 1.73,
-      "drawdown": 0.0014000000000000002,
+      "profit_factor": 5.04,
+      "drawdown": 0.0005,
       "profit_percent": 0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:11:25.763690+00:00"
+    "updated_at": "2026-08-19T19:23:23.264195+00:00"
   },
   "BTC/USDT:USDT": {
     "train_timerange": "20260421-20260720",
     "test_timerange": "20260720-20260819",
     "params": {
-      "buy_rsi": 45,
-      "short_rsi": 55,
-      "trend_adx": 30,
-      "sl_multiplier": 2.2,
-      "tp_multiplier": 5.0
+      "buy_rsi": 42,
+      "short_rsi": 64,
+      "trend_adx": 35,
+      "sl_multiplier": 2.876,
+      "tp_multiplier": 3.358
     },
     "metrics": {
       "trades": 0,
-      "profit_factor": 0.87,
-      "drawdown": 0.0009,
+      "profit_factor": 0.0,
+      "drawdown": 0.0,
       "profit_percent": 0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:11:34.699426+00:00"
+    "updated_at": "2026-08-19T19:23:34.048033+00:00"
   },
   "SOL/USDT:USDT": {
     "train_timerange": "20260421-20260720",
     "test_timerange": "20260720-20260819",
     "params": {
-      "buy_rsi": 45,
-      "short_rsi": 55,
-      "trend_adx": 30,
-      "sl_multiplier": 2.2,
-      "tp_multiplier": 5.0
+      "buy_rsi": 38,
+      "short_rsi": 46,
+      "trend_adx": 38,
+      "sl_multiplier": 2.883,
+      "tp_multiplier": 6.395
     },
     "metrics": {
       "trades": 0,
       "profit_factor": 0.0,
-      "drawdown": 0.0021,
+      "drawdown": 0.0012,
       "profit_percent": 0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:11:43.503908+00:00"
+    "updated_at": "2026-08-19T19:23:44.686226+00:00"
   },
   "XRP/USDT:USDT": {
     "train_timerange": "20260421-20260720",
     "test_timerange": "20260720-20260819",
     "params": {
-      "buy_rsi": 45,
+      "buy_rsi": 37,
       "short_rsi": 55,
-      "trend_adx": 30,
-      "sl_multiplier": 2.2,
-      "tp_multiplier": 5.0
+      "trend_adx": 35,
+      "sl_multiplier": 3.747,
+      "tp_multiplier": 3.923
     },
     "metrics": {
       "trades": 0,
-      "profit_factor": 1.76,
-      "drawdown": 0.0019,
+      "profit_factor": 0.0,
+      "drawdown": 0.0,
       "profit_percent": 0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:11:52.862136+00:00"
+    "updated_at": "2026-08-19T19:23:55.629508+00:00"
   },
   "BTW/USDT:USDT": {
     "train_timerange": "20260421-20260720",
     "test_timerange": "20260720-20260819",
     "params": {
-      "buy_rsi": 45,
-      "short_rsi": 55,
-      "trend_adx": 30,
-      "sl_multiplier": 2.2,
-      "tp_multiplier": 5.0
+      "buy_rsi": 50,
+      "short_rsi": 65,
+      "trend_adx": 21,
+      "sl_multiplier": 2.204,
+      "tp_multiplier": 4.921
     },
     "metrics": {
       "trades": 0,
-      "profit_factor": 0.22,
-      "drawdown": 0.016399999999999998,
+      "profit_factor": 5.07,
+      "drawdown": 0.0113,
       "profit_percent": 0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:12:01.812069+00:00"
+    "updated_at": "2026-08-19T19:24:07.290838+00:00"
   }
 }
