@@ -1,5 +1,5 @@
+import argparse
 import json
-import re
 import subprocess
 from pathlib import Path
 
@@ -20,7 +20,9 @@ HISTORY_FILE = Path(
     "data/optimization_history.json"
 )
 
-EPOCHS = 250
+# İlk test.
+# Sistem çalışınca 100 -> 250 -> 500 yapabiliriz.
+EPOCHS = 50
 
 
 DEFAULT_PARAMS = {
@@ -59,12 +61,8 @@ def save_json(path, data):
         exist_ok=True
     )
 
-    temp = path.with_suffix(
-        path.suffix + ".tmp"
-    )
-
     with open(
-        temp,
+        path,
         "w",
         encoding="utf-8"
     ) as f:
@@ -75,47 +73,125 @@ def save_json(path, data):
             indent=2
         )
 
-    temp.replace(path)
 
+def run_hyperopt(
+    pair,
+    timerange
+):
 
-def extract_params(text):
+    print("")
+    print("=" * 70)
+    print(
+        f"HYPEROPT: {pair}"
+    )
+    print(
+        f"TRAIN: {timerange}"
+    )
+    print("=" * 70)
 
-    # Freqtrade JSON çıktısından
-    # params bölümünü yakalamaya çalış.
+    command = [
+        "freqtrade",
+        "hyperopt",
 
-    matches = re.findall(
-        r'"params"\s*:\s*(\{.*?\})',
-        text,
-        flags=re.DOTALL
+        "--config",
+        CONFIG,
+
+        "--strategy",
+        STRATEGY,
+
+        "--pairs",
+        pair,
+
+        "--timerange",
+        timerange,
+
+        "--epochs",
+        str(EPOCHS),
+
+        "--spaces",
+        "buy",
+        "sell",
+
+        "--hyperopt-loss",
+        "SharpeHyperOptLossDaily",
+
+        "--random-state",
+        "42",
+
+        "--print-json",
+
+        "-j",
+        "2",
+    ]
+
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True
     )
 
-    for match in reversed(matches):
+    output = (
+        result.stdout
+        +
+        "\n"
+        +
+        result.stderr
+    )
+
+    print(output[-6000:])
+
+    if result.returncode != 0:
+
+        raise RuntimeError(
+            f"Hyperopt başarısız: {pair}"
+        )
+
+    # ---------------------------------------------------------
+    # Hyperopt'ın ürettiği JSON'u bul.
+    # ---------------------------------------------------------
+
+    best_params = None
+
+    for line in output.splitlines():
+
+        line = line.strip()
+
+        if not line.startswith("{"):
+            continue
 
         try:
 
-            params = json.loads(match)
+            data = json.loads(line)
 
-            if isinstance(params, dict):
+            if "params" in data:
 
-                return params
+                best_params = data["params"]
 
         except Exception:
+            continue
 
-            pass
+    if not best_params:
 
-    return None
+        raise RuntimeError(
+            f"{pair}: Hyperopt sonucu bulunamadı."
+        )
+
+    return normalize_params(
+        best_params
+    )
 
 
 def normalize_params(params):
 
     result = DEFAULT_PARAMS.copy()
 
-    if not params:
-        return result
-
-    # buy
     buy = params.get(
         "buy",
+        {}
+    )
+
+    sell = params.get(
+        "sell",
         {}
     )
 
@@ -137,12 +213,6 @@ def normalize_params(params):
             buy["trend_adx"]
         )
 
-    # sell
-    sell = params.get(
-        "sell",
-        {}
-    )
-
     if "sl_multiplier" in sell:
 
         result["sl_multiplier"] = float(
@@ -158,107 +228,7 @@ def normalize_params(params):
     return result
 
 
-def optimize_pair(
-    pair,
-    train_timerange
-):
-
-    print(
-        f"\n{'=' * 70}"
-    )
-
-    print(
-        f"OPTIMIZE: {pair}"
-    )
-
-    print(
-        f"TRAIN: {train_timerange}"
-    )
-
-    print(
-        f"{'=' * 70}"
-    )
-
-    command = [
-        "freqtrade",
-        "hyperopt",
-
-        "--config",
-        CONFIG,
-
-        "--strategy",
-        STRATEGY,
-
-        "--pairs",
-        pair,
-
-        "--timerange",
-        train_timerange,
-
-        "--epochs",
-        str(EPOCHS),
-
-        "--spaces",
-        "buy",
-        "sell",
-
-        "--hyperopt-loss",
-        "SharpeHyperOptLossDaily",
-
-        "--print-json",
-
-        "--random-state",
-        "42",
-
-        "-j",
-        "-1",
-    ]
-
-    result = subprocess.run(
-        command,
-        capture_output=True,
-        text=True
-    )
-
-    output = (
-        result.stdout
-        +
-        "\n"
-        +
-        result.stderr
-    )
-
-    if result.returncode != 0:
-
-        print(output)
-
-        raise RuntimeError(
-            f"Hyperopt başarısız: {pair}"
-        )
-
-    params = extract_params(
-        output
-    )
-
-    if params is None:
-
-        print(output)
-
-        raise RuntimeError(
-            f"Hyperopt parametreleri "
-            f"okunamadı: {pair}"
-        )
-
-    return normalize_params(
-        params
-    )
-
-
 def main():
-
-    train_timerange = None
-
-    import argparse
 
     parser = argparse.ArgumentParser()
 
@@ -267,17 +237,11 @@ def main():
         required=True
     )
 
-    parser.add_argument(
-        "--pair"
-    )
-
     args = parser.parse_args()
-
-    train_timerange = args.timerange
 
     candidate_data = load_json(
         CANDIDATE_FILE,
-        {"pairs": []}
+        {}
     )
 
     pairs = candidate_data.get(
@@ -285,17 +249,17 @@ def main():
         []
     )
 
-    if args.pair:
-
-        pairs = [
-            args.pair
-        ]
-
     if not pairs:
 
         raise RuntimeError(
-            "Taranacak coin bulunamadı."
+            "candidate_pairs.json boş!"
         )
+
+    print("")
+    print(
+        f"Optimize edilecek coin: "
+        f"{len(pairs)}"
+    )
 
     pair_params = load_json(
         PARAM_FILE,
@@ -307,13 +271,18 @@ def main():
         []
     )
 
+    successful = 0
+    failed = 0
+
+    errors = []
+
     for pair in pairs:
 
         try:
 
-            params = optimize_pair(
+            params = run_hyperopt(
                 pair,
-                train_timerange
+                args.timerange
             )
 
             pair_params[pair] = params
@@ -321,7 +290,7 @@ def main():
             history.append({
                 "pair": pair,
                 "train_timerange":
-                    train_timerange,
+                    args.timerange,
                 "params": params
             })
 
@@ -335,8 +304,11 @@ def main():
                 history
             )
 
+            successful += 1
+
+            print("")
             print(
-                f"{pair} PARAMETRELERİ:"
+                f"✅ {pair} BAŞARILI"
             )
 
             print(
@@ -348,12 +320,73 @@ def main():
 
         except Exception as e:
 
+            failed += 1
+
+            errors.append({
+                "pair": pair,
+                "error": str(e)
+            })
+
+            print("")
             print(
-                f"{pair} başarısız: {e}"
+                f"❌ {pair} BAŞARISIZ"
             )
 
+            print(e)
+
+    print("")
+    print("=" * 70)
+    print("HYPEROPT ÖZET")
+    print("=" * 70)
+
     print(
-        "\nOPTİMİZASYON TAMAMLANDI."
+        f"Toplam : {len(pairs)}"
+    )
+
+    print(
+        f"Başarılı: {successful}"
+    )
+
+    print(
+        f"Başarısız: {failed}"
+    )
+
+    # ---------------------------------------------------------
+    # Hiçbir coin optimize olmadıysa workflow kesinlikle
+    # başarısız olsun.
+    # ---------------------------------------------------------
+
+    if successful == 0:
+
+        save_json(
+            Path(
+                "data/optimization_errors.json"
+            ),
+            errors
+        )
+
+        raise RuntimeError(
+            "HİÇBİR COIN İÇİN HYPEROPT BAŞARILI OLMADI!"
+        )
+
+    # Bazı coinler hata verdi ama bazıları başarılıysa
+    # sonucu yine kaydet.
+    if errors:
+
+        save_json(
+            Path(
+                "data/optimization_errors.json"
+            ),
+            errors
+        )
+
+        print(
+            "⚠️ Bazı coinler optimize edilemedi."
+        )
+
+    print("")
+    print(
+        "OPTİMİZASYON TAMAMLANDI."
     )
 
 
