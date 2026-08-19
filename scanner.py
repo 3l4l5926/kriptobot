@@ -4,12 +4,13 @@ from pathlib import Path
 import ccxt
 
 
-OUTPUT_FILE = Path(
-    "data/candidate_pairs.json"
-)
+OUTPUT_FILE = Path("data/candidate_pairs.json")
 
-MAX_PAIRS = 80
+# İlk testte 20 coin ile başlayalım.
+# Sistem sorunsuz çalışınca 80'e çıkarırız.
+MAX_PAIRS = 20
 
+# Minimum 24 saatlik USDT hacmi
 MIN_QUOTE_VOLUME = 5_000_000
 
 
@@ -22,14 +23,24 @@ def main():
 
     print("Gate Futures taranıyor...")
 
-    exchange = ccxt.gateio({
+    # Güncel CCXT'de Gate sınıfı:
+    # ccxt.gate()
+    exchange = ccxt.gate({
         "enableRateLimit": True,
         "options": {
             "defaultType": "swap"
         }
     })
 
+    print("Gate piyasaları yükleniyor...")
+
     markets = exchange.load_markets()
+
+    print(
+        f"{len(markets)} piyasa bulundu."
+    )
+
+    print("Ticker verileri alınıyor...")
 
     tickers = exchange.fetch_tickers()
 
@@ -39,12 +50,15 @@ def main():
 
         try:
 
+            # Sadece aktif piyasalar
             if not market.get("active", True):
                 continue
 
+            # Sadece swap / perpetual
             if market.get("type") != "swap":
                 continue
 
+            # Sadece USDT
             if market.get("quote") != "USDT":
                 continue
 
@@ -61,36 +75,52 @@ def main():
                 or 0
             )
 
+            quote_volume = float(
+                quote_volume
+            )
+
+            # Likidite filtresi
             if quote_volume < MIN_QUOTE_VOLUME:
+                continue
+
+            last_price = ticker.get("last")
+
+            if not last_price:
                 continue
 
             candidates.append({
                 "pair": symbol,
-                "quote_volume": float(
-                    quote_volume
-                ),
-                "last": ticker.get("last"),
+                "quote_volume": quote_volume,
+                "last": float(last_price)
             })
 
         except Exception as e:
 
             print(
-                f"Pair atlandı {symbol}: {e}"
+                f"Pair atlandı: {symbol} -> {e}"
             )
 
+    # Hacme göre sırala
     candidates.sort(
         key=lambda x: x["quote_volume"],
         reverse=True
     )
 
+    # En likit ilk coinler
     candidates = candidates[
         :MAX_PAIRS
     ]
 
     pairs = [
-        x["pair"]
-        for x in candidates
+        item["pair"]
+        for item in candidates
     ]
+
+    result = {
+        "pairs": pairs,
+        "count": len(pairs),
+        "pairs_detail": candidates
+    }
 
     with open(
         OUTPUT_FILE,
@@ -99,22 +129,34 @@ def main():
     ) as f:
 
         json.dump(
-            {
-                "pairs": pairs,
-                "count": len(pairs),
-                "pairs_detail": candidates
-            },
+            result,
             f,
             indent=2
         )
 
+    print("")
+    print("=" * 60)
     print(
-        f"{len(pairs)} coin seçildi."
+        f"TARAMA TAMAMLANDI: {len(pairs)} COIN"
     )
+    print("=" * 60)
 
-    for pair in pairs:
+    for index, item in enumerate(
+        candidates,
+        start=1
+    ):
 
-        print(pair)
+        print(
+            f"{index:02d}. "
+            f"{item['pair']} | "
+            f"Hacim: "
+            f"{item['quote_volume']:,.0f} USDT"
+        )
+
+    print("")
+    print(
+        f"Sonuç kaydedildi: {OUTPUT_FILE}"
+    )
 
 
 if __name__ == "__main__":
