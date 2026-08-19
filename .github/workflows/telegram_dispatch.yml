@@ -1,0 +1,74 @@
+name: Telegram Command Dispatch
+
+permissions:
+  contents: write
+
+on:
+  repository_dispatch:
+    types: [telegram_command]
+
+jobs:
+  handle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Repository
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install "freqtrade[hyperopt]"
+
+      - name: Create directories
+        run: |
+          mkdir -p data
+          mkdir -p user_data/strategies
+          mkdir -p user_data/configs
+          mkdir -p user_data/data
+          mkdir -p user_data/backtest_results
+
+          cp QuantumMomentumStrategy.py user_data/strategies/
+          cp config.json user_data/configs/
+
+      - name: Run command
+        env:
+          BOT_COMMAND: ${{ github.event.client_payload.command }}
+          BOT_ARGS: ${{ github.event.client_payload.args }}
+        run: python bot_dispatch.py
+
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "quantum-bot"
+          git config user.email "quantum-bot@users.noreply.github.com"
+
+          git add data/
+
+          git diff --cached --quiet || \
+            git commit -m "Telegram command: ${{ github.event.client_payload.command }}"
+
+          git push || echo "Push edilecek değişiklik yok veya push başarısız."
+
+      - name: Send result to Telegram
+        if: always()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ github.event.client_payload.chat_id }}
+        run: |
+          if [ -f dispatch_output.txt ]; then
+            TEXT=$(cat dispatch_output.txt)
+          else
+            TEXT="❌ Komut çalıştı ama çıktı üretmedi (workflow loglarına bak)."
+          fi
+
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${CHAT_ID}" \
+            --data-urlencode "text=${TEXT}" > /dev/null
