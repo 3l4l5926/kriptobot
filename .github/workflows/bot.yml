@@ -1,0 +1,27 @@
+name: Kripto Bot 7/24
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Her 5 dakikada bir çalıştırır
+  workflow_dispatch: # İstersen elden de tetikleyebilirsin
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları Depodan Çek
+        uses: actions/checkout@v4
+
+      - name: Python Kurulumu
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Kütüphaneleri Yükle
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Botu Çalıştır
+        run: |
+          freqtrade trade --strategy QuantumMomentumStrategy --config config.json
