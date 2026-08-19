@@ -57,6 +57,72 @@ jobs:
           cp config.json \
              user_data/configs/
 
+      - name: Calculate dates
+        id: dates
+        run: |
+
+          python - <<'PY'
+
+          from datetime import datetime, timedelta, timezone
+
+          today = datetime.now(
+              timezone.utc
+          ).date()
+
+          test_end = today
+
+          test_start = (
+              test_end -
+              timedelta(days=30)
+          )
+
+          train_start = (
+              test_start -
+              timedelta(days=90)
+          )
+
+          print(
+              "TRAIN_START=" +
+              train_start.strftime("%Y%m%d")
+          )
+
+          print(
+              "TEST_START=" +
+              test_start.strftime("%Y%m%d")
+          )
+
+          print(
+              "TEST_END=" +
+              test_end.strftime("%Y%m%d")
+          )
+
+          with open(
+              "dates.env",
+              "w"
+          ) as f:
+
+              f.write(
+                  "TRAIN_START=" +
+                  train_start.strftime("%Y%m%d") +
+                  "\n"
+              )
+
+              f.write(
+                  "TEST_START=" +
+                  test_start.strftime("%Y%m%d") +
+                  "\n"
+              )
+
+              f.write(
+                  "TEST_END=" +
+                  test_end.strftime("%Y%m%d") +
+                  "\n"
+              )
+
+          PY
+
+          cat dates.env
+
       - name: Scan
         run: |
 
@@ -65,31 +131,27 @@ jobs:
       - name: Download futures data
         run: |
 
+          source dates.env
+
           freqtrade download-data \
             --config config.json \
             --trading-mode futures \
             --timeframes 15m \
-            --timerange 20260521-20260819 \
-            --pairs ETH/USDT:USDT BTC/USDT:USDT SOL/USDT:USDT XRP/USDT:USDT BTW/USDT:USDT
+            --timerange "${TRAIN_START}-${TEST_END}" \
+            --pairs \
+              ETH/USDT:USDT \
+              BTC/USDT:USDT \
+              SOL/USDT:USDT \
+              XRP/USDT:USDT \
+              BTW/USDT:USDT
 
       - name: Optimize
         run: |
 
+          source dates.env
+
           python optimizer.py \
-            --timerange "$(python - <<'PY'
-          from datetime import datetime, timedelta, timezone
-
-          end = datetime.now(timezone.utc).date()
-
-          start = end - timedelta(days=90)
-
-          print(
-              start.strftime("%Y%m%d")
-              + "-"
-              + end.strftime("%Y%m%d")
-          )
-          PY
-          )"
+            --timerange "${TRAIN_START}-${TEST_START}"
 
       - name: Walk Forward Test
         run: |
@@ -99,23 +161,12 @@ jobs:
       - name: Lookahead check
         run: |
 
+          source dates.env
+
           freqtrade lookahead-analysis \
             --config config.json \
             --strategy QuantumMomentumStrategy \
-            --timerange "$(python - <<'PY'
-          from datetime import datetime, timedelta, timezone
-
-          end = datetime.now(timezone.utc).date()
-
-          start = end - timedelta(days=30)
-
-          print(
-              start.strftime("%Y%m%d")
-              + "-"
-              + end.strftime("%Y%m%d")
-          )
-          PY
-          )" \
+            --timerange "${TEST_START}-${TEST_END}" \
             --pairs BTC/USDT:USDT \
             --minimum-trade-amount 10 || true
 
@@ -124,11 +175,13 @@ jobs:
 
           git config user.name "quantum-bot"
 
-          git config user.email "quantum-bot@users.noreply.github.com"
+          git config user.email \
+            "quantum-bot@users.noreply.github.com"
 
           git add data/
 
           git diff --cached --quiet || \
-            git commit -m "Update walk-forward results"
+            git commit \
+            -m "Update walk-forward results"
 
           git push
