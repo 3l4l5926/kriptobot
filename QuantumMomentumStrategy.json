@@ -1,0 +1,31 @@
+{
+  "strategy_name": "QuantumMomentumStrategy",
+  "params": {
+    "roi": {
+      "0": 100.0
+    },
+    "stoploss": {
+      "stoploss": -0.99
+    },
+    "trailing": {
+      "trailing_stop": false,
+      "trailing_stop_positive": null,
+      "trailing_stop_positive_offset": 0.0,
+      "trailing_only_offset_is_reached": false
+    },
+    "max_open_trades": {
+      "max_open_trades": 10
+    },
+    "buy": {
+      "buy_rsi": 41,
+      "short_rsi": 56,
+      "trend_adx": 32
+    },
+    "sell": {
+      "sl_multiplier": 2.228,
+      "tp_multiplier": 6.036
+    }
+  },
+  "ft_stratparam_v": 1,
+  "export_time": "2026-08-19 14:42:10.581233+00:00"
+}
