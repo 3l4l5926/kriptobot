@@ -1,16 +1,12 @@
-
 name: Quantum Bot Research
-
 
 permissions:
   contents: write
 
 on:
-
   workflow_dispatch:
 
   schedule:
-
     - cron: "0 3 * * 0"
 
 jobs:
@@ -26,7 +22,6 @@ jobs:
 
       - name: Python
         uses: actions/setup-python@v5
-
         with:
           python-version: "3.13"
 
@@ -37,13 +32,24 @@ jobs:
 
           pip install -r requirements.txt
 
+          pip install "freqtrade[hyperopt]"
+
+          python -c "import filelock; print('filelock OK')"
+
+          freqtrade --version
+
       - name: Create directories
         run: |
 
           mkdir -p data
+
           mkdir -p user_data/strategies
+
           mkdir -p user_data/configs
+
           mkdir -p user_data/data
+
+          mkdir -p data/backtests
 
           cp QuantumMomentumStrategy.py \
              user_data/strategies/
@@ -57,12 +63,6 @@ jobs:
           python scanner.py
 
       - name: Download futures data
-        env:
-
-          FREQTRADE__TELEGRAM__TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-
-          FREQTRADE__TELEGRAM__CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-
         run: |
 
           freqtrade download-data \
@@ -77,10 +77,17 @@ jobs:
 
           python optimizer.py \
             --timerange "$(python - <<'PY'
-          from datetime import datetime,timedelta,timezone
-          end=datetime.now(timezone.utc).date()
-          start=end-timedelta(days=90)
-          print(start.strftime('%Y%m%d')+'-'+end.strftime('%Y%m%d'))
+          from datetime import datetime, timedelta, timezone
+
+          end = datetime.now(timezone.utc).date()
+
+          start = end - timedelta(days=90)
+
+          print(
+              start.strftime("%Y%m%d")
+              + "-"
+              + end.strftime("%Y%m%d")
+          )
           PY
           )"
 
@@ -96,10 +103,17 @@ jobs:
             --config config.json \
             --strategy QuantumMomentumStrategy \
             --timerange "$(python - <<'PY'
-          from datetime import datetime,timedelta,timezone
-          end=datetime.now(timezone.utc).date()
-          start=end-timedelta(days=30)
-          print(start.strftime('%Y%m%d')+'-'+end.strftime('%Y%m%d'))
+          from datetime import datetime, timedelta, timezone
+
+          end = datetime.now(timezone.utc).date()
+
+          start = end - timedelta(days=30)
+
+          print(
+              start.strftime("%Y%m%d")
+              + "-"
+              + end.strftime("%Y%m%d")
+          )
           PY
           )" \
             --pairs BTC/USDT:USDT \
