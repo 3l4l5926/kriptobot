@@ -27,4 +27,8 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          freqtrade trade --strategy QuantumMomentumStrategy --config config.json
+          freqtrade create-userdir --userdir user_data
+          mkdir -p user_data/strategies user_data/configs
+          cp QuantumMomentumStrategy.py user_data/strategies/
+          cp config.json user_data/configs/
+          freqtrade trade --strategy QuantumMomentumStrategy --config user_data/configs/config.json --userdir user_data
