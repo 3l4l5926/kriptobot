@@ -16,7 +16,7 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T20:29:21.738922+00:00"
+    "updated_at": "2026-08-19T20:39:14.449134+00:00"
   },
   "BTC/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -35,7 +35,7 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T20:29:31.171486+00:00"
+    "updated_at": "2026-08-19T20:39:23.177808+00:00"
   },
   "SOL/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -54,7 +54,7 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T20:29:39.999032+00:00"
+    "updated_at": "2026-08-19T20:39:31.564282+00:00"
   },
   "XRP/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -73,7 +73,7 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T20:29:48.607279+00:00"
+    "updated_at": "2026-08-19T20:39:40.057946+00:00"
   },
   "BTW/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -92,6 +92,6 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T20:29:58.338872+00:00"
+    "updated_at": "2026-08-19T20:39:49.598927+00:00"
   }
 }
