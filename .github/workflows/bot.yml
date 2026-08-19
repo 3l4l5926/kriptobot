@@ -17,25 +17,13 @@ jobs:
 
     steps:
 
-      # =====================================================
-      # REPOSITORY
-      # =====================================================
-
       - name: Repository
         uses: actions/checkout@v4
-
-      # =====================================================
-      # PYTHON
-      # =====================================================
 
       - name: Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-
-      # =====================================================
-      # INSTALL
-      # =====================================================
 
       - name: Install
         run: |
@@ -50,38 +38,21 @@ jobs:
 
           freqtrade --version
 
-      # =====================================================
-      # DIRECTORIES
-      # =====================================================
-
       - name: Create directories
         run: |
 
           mkdir -p data
-          mkdir -p data/backtests
-
           mkdir -p user_data
           mkdir -p user_data/strategies
           mkdir -p user_data/configs
           mkdir -p user_data/data
+          mkdir -p user_data/backtest_results
 
           cp QuantumMomentumStrategy.py \
              user_data/strategies/
 
           cp config.json \
              user_data/configs/
-
-      # =====================================================
-      # CALCULATE DATES
-      #
-      # TEST  = son 30 gün
-      # TRAIN = testten önceki 90 gün
-      #
-      # Örneğin bugün 2026-08-19 ise:
-      #
-      # TRAIN = 20260421-20260720
-      # TEST  = 20260720-20260819
-      # =====================================================
 
       - name: Calculate dates
         shell: bash
@@ -161,18 +132,10 @@ jobs:
 
           cat dates.env >> "$GITHUB_ENV"
 
-      # =====================================================
-      # SCAN
-      # =====================================================
-
       - name: Scan
         run: |
 
           python scanner.py
-
-      # =====================================================
-      # CHECK CANDIDATE PAIRS
-      # =====================================================
 
       - name: Check candidate pairs
         shell: bash
@@ -183,10 +146,8 @@ jobs:
           import json
           import sys
 
-          path = "data/candidate_pairs.json"
-
           with open(
-              path,
+              "data/candidate_pairs.json",
               "r",
               encoding="utf-8"
           ) as f:
@@ -207,29 +168,11 @@ jobs:
               print(pair)
 
           if not pairs:
-
-              print(
-                  "ERROR: candidate_pairs.json boş!"
+              sys.exit(
+                  "candidate_pairs.json boş!"
               )
 
-              sys.exit(1)
-
           PY
-
-      # =====================================================
-      # DOWNLOAD FUTURES DATA
-      #
-      # Gate 15m uzun tarih aralığında problem çıkardığı
-      # için 30 günlük parçalar halinde indiriyoruz.
-      #
-      # Toplam:
-      #
-      # 90 gün TRAIN
-      # +
-      # 30 gün TEST
-      # =
-      # 120 gün veri
-      # =====================================================
 
       - name: Download futures data
         shell: bash
@@ -238,17 +181,13 @@ jobs:
           python - <<'PY'
 
           import json
+          import os
           import subprocess
 
           from datetime import (
               datetime,
               timedelta
           )
-
-
-          # -----------------------------------------------
-          # Candidate coinleri oku
-          # -----------------------------------------------
 
           with open(
               "data/candidate_pairs.json",
@@ -258,45 +197,22 @@ jobs:
 
               data = json.load(f)
 
-
           pairs = data.get(
               "pairs",
               []
           )
-
-
-          if not pairs:
-
-              raise SystemExit(
-                  "candidate_pairs.json boş!"
-              )
-
-
-          # -----------------------------------------------
-          # Tarihler GitHub ENV'den geliyor
-          # -----------------------------------------------
-
-          import os
-
 
           train_start = datetime.strptime(
               os.environ["TRAIN_START"],
               "%Y%m%d"
           )
 
-
           test_end = datetime.strptime(
               os.environ["TEST_END"],
               "%Y%m%d"
           )
 
-
-          # -----------------------------------------------
-          # 30 günlük parçalar
-          # -----------------------------------------------
-
           current = train_start
-
 
           while current < test_end:
 
@@ -305,11 +221,8 @@ jobs:
                   timedelta(days=30)
               )
 
-
               if next_date > test_end:
-
                   next_date = test_end
-
 
               timerange = (
                   current.strftime("%Y%m%d")
@@ -319,224 +232,119 @@ jobs:
                   next_date.strftime("%Y%m%d")
               )
 
-
-              print("")
-              print("=" * 70)
               print(
                   "DOWNLOADING:",
                   timerange
               )
-              print(
-                  "PAIR COUNT:",
-                  len(pairs)
-              )
-              print("=" * 70)
-
 
               command = [
-
                   "freqtrade",
-
                   "download-data",
-
                   "--config",
                   "config.json",
-
                   "--trading-mode",
                   "futures",
-
                   "--timeframes",
                   "15m",
-
                   "--timerange",
                   timerange,
-
                   "--pairs"
-
               ]
 
-
-              command.extend(
-                  pairs
-              )
-
+              command.extend(pairs)
 
               result = subprocess.run(
                   command
               )
 
-
               if result.returncode != 0:
-
                   raise SystemExit(
-                      "Futures data download failed."
+                      "Data download failed."
                   )
-
 
               current = next_date
 
-
           PY
 
-      # =====================================================
-      # VERIFY DOWNLOADED DATA
-      # =====================================================
-
-      - name: Verify downloaded data
-        shell: bash
+      - name: Verify data
         run: |
 
-          echo ""
-          echo "=========================================="
-          echo "DOWNLOADED DATA"
-          echo "=========================================="
-
+          echo "DATA:"
           find user_data/data \
             -type f \
             | head -100
-
-      # =====================================================
-      # OPTIMIZE
-      #
-      # SADECE TRAIN DÖNEMİ
-      #
-      # TEST VERİSİ BURADA KULLANILMAZ.
-      # =====================================================
 
       - name: Optimize
         shell: bash
         run: |
 
-          echo ""
-          echo "=========================================="
-          echo "HYPEROPT"
-          echo "=========================================="
-
-          echo "TRAIN:"
+          echo "================================"
+          echo "TRAIN"
           echo "${TRAIN_START}-${TEST_START}"
+          echo "================================"
 
           python optimizer.py \
             --timerange \
             "${TRAIN_START}-${TEST_START}"
 
-      # =====================================================
-      # WALK FORWARD TEST
-      #
-      # TRAIN PARAMETRELERİ
-      # SONRAKİ 30 GÜNDE TEST EDİLİR.
-      # =====================================================
-
       - name: Walk Forward Test
         shell: bash
         run: |
 
-          echo ""
-          echo "=========================================="
+          echo "================================"
           echo "WALK FORWARD"
-          echo "=========================================="
-
-          echo "TRAIN:"
-          echo "${TRAIN_START}-${TEST_START}"
-
-          echo "TEST:"
-          echo "${TEST_START}-${TEST_END}"
+          echo "TRAIN: ${TRAIN_START}-${TEST_START}"
+          echo "TEST : ${TEST_START}-${TEST_END}"
+          echo "================================"
 
           python walk_forward.py
 
-      # =====================================================
-      # LOOKAHEAD ANALYSIS
-      # =====================================================
-
-      - name: Lookahead check
+      - name: Analyze backtest signals
         shell: bash
         run: |
 
-          echo ""
-          echo "=========================================="
-          echo "LOOKAHEAD ANALYSIS"
-          echo "=========================================="
+          echo "================================"
+          echo "BACKTEST SIGNAL ANALYSIS"
+          echo "================================"
 
-          freqtrade lookahead-analysis \
+          freqtrade backtesting-analysis \
             --config config.json \
-            --strategy QuantumMomentumStrategy \
-            --timerange \
-            "${TEST_START}-${TEST_END}" \
-            --pairs BTC/USDT:USDT \
-            --minimum-trade-amount 10 \
+            --backtest-directory user_data/backtest_results \
+            --analysis-groups 0 1 2 3 \
+            --rejected-signals \
+            --indicator-list \
+            rsi \
+            adx \
+            macd \
+            macdsignal \
             || true
 
-      # =====================================================
-      # SHOW PAIR PARAMETERS
-      # =====================================================
-
       - name: Show pair parameters
-        shell: bash
         run: |
 
-          echo ""
-          echo "=========================================="
-          echo "PAIR PARAMETERS"
-          echo "=========================================="
+          echo "=============================="
+          echo "PAIR PARAMS"
+          echo "=============================="
 
-          if [ -f data/pair_params.json ]; then
-
-              cat data/pair_params.json
-
-          else
-
-              echo "pair_params.json bulunamadı."
-
-          fi
-
-      # =====================================================
-      # SHOW WALK FORWARD RESULTS
-      # =====================================================
+          cat data/pair_params.json || true
 
       - name: Show walk forward results
-        shell: bash
         run: |
 
-          echo ""
-          echo "=========================================="
+          echo "=============================="
           echo "WALK FORWARD RESULTS"
-          echo "=========================================="
+          echo "=============================="
 
-          if [ -f data/walk_forward_results.json ]; then
-
-              cat data/walk_forward_results.json
-
-          else
-
-              echo "walk_forward_results.json bulunamadı."
-
-          fi
-
-      # =====================================================
-      # SHOW ACTIVE PAIRS
-      # =====================================================
+          cat data/walk_forward_results.json || true
 
       - name: Show active pairs
-        shell: bash
         run: |
 
-          echo ""
-          echo "=========================================="
+          echo "=============================="
           echo "ACTIVE PAIRS"
-          echo "=========================================="
+          echo "=============================="
 
-          if [ -f data/active_pairs.json ]; then
-
-              cat data/active_pairs.json
-
-          else
-
-              echo "active_pairs.json bulunamadı."
-
-          fi
-
-      # =====================================================
-      # SAVE RESULTS TO GITHUB
-      # =====================================================
+          cat data/active_pairs.json || true
 
       - name: Save results
         shell: bash
