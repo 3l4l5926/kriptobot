@@ -84,7 +84,7 @@
         "listen_port": 8080,
         "verbosity": "error",
         "enable_openapi": false,
-        "jwt_secret_key": "change_this_secret",
+        "jwt_secret_key": "QuantumBot_2026_SecureSecret_9X7K2M",
         "CORS_origins": [],
         "username": "",
         "password": ""
