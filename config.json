@@ -63,5 +63,10 @@
         "exit": "limit",
         "stoploss": "market",
         "stoploss_on_exchange": false
+    },
+    "telegram": {
+        "enabled": true,
+        "token": "${{ secrets.TELEGRAM_TOKEN }}",
+        "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}"
     }
 }
