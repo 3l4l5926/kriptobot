@@ -17,13 +17,25 @@ jobs:
 
     steps:
 
+      # =====================================================
+      # REPOSITORY
+      # =====================================================
+
       - name: Repository
         uses: actions/checkout@v4
+
+      # =====================================================
+      # PYTHON
+      # =====================================================
 
       - name: Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+
+      # =====================================================
+      # INSTALL
+      # =====================================================
 
       - name: Install
         run: |
@@ -38,10 +50,18 @@ jobs:
 
           freqtrade --version
 
+      # =====================================================
+      # DIRECTORIES
+      # =====================================================
+
       - name: Create directories
         run: |
 
           mkdir -p data
+
+          mkdir -p data/backtests
+
+          mkdir -p user_data
 
           mkdir -p user_data/strategies
 
@@ -49,16 +69,30 @@ jobs:
 
           mkdir -p user_data/data
 
-          mkdir -p data/backtests
-
           cp QuantumMomentumStrategy.py \
              user_data/strategies/
 
           cp config.json \
              user_data/configs/
 
+      # =====================================================
+      # DATE CALCULATION
+      #
+      # TRAIN = 90 DAYS
+      # TEST  = 30 DAYS
+      #
+      # Örnek:
+      #
+      # TRAIN
+      # 20260421 -> 20260720
+      #
+      # TEST
+      # 20260720 -> 20260819
+      # =====================================================
+
       - name: Calculate dates
         id: dates
+        shell: bash
         run: |
 
           python - <<'PY'
@@ -81,19 +115,23 @@ jobs:
               timedelta(days=90)
           )
 
+          train_start_s = train_start.strftime("%Y%m%d")
+          test_start_s = test_start.strftime("%Y%m%d")
+          test_end_s = test_end.strftime("%Y%m%d")
+
           print(
-              "TRAIN_START=" +
-              train_start.strftime("%Y%m%d")
+              "TRAIN START:",
+              train_start_s
           )
 
           print(
-              "TEST_START=" +
-              test_start.strftime("%Y%m%d")
+              "TEST START:",
+              test_start_s
           )
 
           print(
-              "TEST_END=" +
-              test_end.strftime("%Y%m%d")
+              "TEST END:",
+              test_end_s
           )
 
           with open(
@@ -102,63 +140,204 @@ jobs:
           ) as f:
 
               f.write(
-                  "TRAIN_START=" +
-                  train_start.strftime("%Y%m%d") +
-                  "\n"
+                  f"TRAIN_START={train_start_s}\n"
               )
 
               f.write(
-                  "TEST_START=" +
-                  test_start.strftime("%Y%m%d") +
-                  "\n"
+                  f"TEST_START={test_start_s}\n"
               )
 
               f.write(
-                  "TEST_END=" +
-                  test_end.strftime("%Y%m%d") +
-                  "\n"
+                  f"TEST_END={test_end_s}\n"
               )
 
           PY
 
           cat dates.env
 
+      # =====================================================
+      # SCAN
+      # =====================================================
+
       - name: Scan
         run: |
 
           python scanner.py
 
+      # =====================================================
+      # DOWNLOAD DATA
+      #
+      # Gate 15m API uzun geçmişte sorun çıkardığı için
+      # veriyi 30 günlük parçalar halinde indiriyoruz.
+      #
+      # Böylece:
+      #
+      # 90 gün TRAIN
+      # +
+      # 30 gün TEST
+      #
+      # toplam 120 günlük veri oluşuyor.
+      # =====================================================
+
       - name: Download futures data
+        shell: bash
         run: |
 
           source dates.env
 
-          freqtrade download-data \
-            --config config.json \
-            --trading-mode futures \
-            --timeframes 15m \
-            --timerange "${TRAIN_START}-${TEST_END}" \
-            --pairs \
-              ETH/USDT:USDT \
-              BTC/USDT:USDT \
-              SOL/USDT:USDT \
-              XRP/USDT:USDT \
-              BTW/USDT:USDT
+          python - <<'PY'
+
+          import subprocess
+          from datetime import datetime, timedelta
+
+          train_start = datetime.strptime(
+              "${TRAIN_START}",
+              "%Y%m%d"
+          )
+
+          test_end = datetime.strptime(
+              "${TEST_END}",
+              "%Y%m%d"
+          )
+
+          pairs = [
+              "ETH/USDT:USDT",
+              "BTC/USDT:USDT",
+              "SOL/USDT:USDT",
+              "XRP/USDT:USDT",
+              "BTW/USDT:USDT"
+          ]
+
+          current = train_start
+
+          while current < test_end:
+
+              next_date = current + timedelta(
+                  days=30
+              )
+
+              if next_date > test_end:
+                  next_date = test_end
+
+              start = current.strftime(
+                  "%Y%m%d"
+              )
+
+              end = next_date.strftime(
+                  "%Y%m%d"
+              )
+
+              timerange = (
+                  f"{start}-{end}"
+              )
+
+              print("")
+              print("=" * 70)
+              print(
+                  "DOWNLOADING:",
+                  timerange
+              )
+              print("=" * 70)
+
+              command = [
+                  "freqtrade",
+                  "download-data",
+
+                  "--config",
+                  "config.json",
+
+                  "--trading-mode",
+                  "futures",
+
+                  "--timeframes",
+                  "15m",
+
+                  "--timerange",
+                  timerange,
+
+                  "--pairs"
+              ]
+
+              command.extend(pairs)
+
+              print(
+                  " ".join(command)
+              )
+
+              result = subprocess.run(
+                  command
+              )
+
+              if result.returncode != 0:
+
+                  raise SystemExit(
+                      "Data download failed."
+                  )
+
+              current = next_date
+
+          PY
+
+      # =====================================================
+      # VERIFY DATA
+      # =====================================================
+
+      - name: Verify downloaded data
+        run: |
+
+          echo "Downloaded files:"
+
+          find user_data/data \
+            -type f \
+            | head -100
+
+      # =====================================================
+      # OPTIMIZE
+      #
+      # SADECE TRAIN DÖNEMİ
+      #
+      # 90 günlük veri üzerinde parametre öğrenir.
+      # TEST verisine bakmaz.
+      # =====================================================
 
       - name: Optimize
+        shell: bash
         run: |
 
           source dates.env
+
+          echo ""
+          echo "=========================================="
+          echo "HYPEROPT TRAINING"
+          echo "=========================================="
+
+          echo "TRAIN:"
+          echo "${TRAIN_START}-${TEST_START}"
 
           python optimizer.py \
             --timerange "${TRAIN_START}-${TEST_START}"
+
+      # =====================================================
+      # WALK FORWARD
+      #
+      # Optimizer'ın bulduğu coin'e özel parametreleri
+      # sonraki 30 günlük TEST döneminde kullanır.
+      # =====================================================
 
       - name: Walk Forward Test
         run: |
 
           python walk_forward.py
 
+      # =====================================================
+      # LOOKAHEAD ANALYSIS
+      #
+      # Son TEST döneminde stratejinin geleceği kullanıp
+      # kullanmadığını kontrol eder.
+      # =====================================================
+
       - name: Lookahead check
+        shell: bash
         run: |
 
           source dates.env
@@ -168,12 +347,52 @@ jobs:
             --strategy QuantumMomentumStrategy \
             --timerange "${TEST_START}-${TEST_END}" \
             --pairs BTC/USDT:USDT \
-            --minimum-trade-amount 10 || true
+            --minimum-trade-amount 10 \
+            || true
+
+      # =====================================================
+      # SHOW RESULTS
+      # =====================================================
+
+      - name: Show results
+        run: |
+
+          echo ""
+          echo "=========================================="
+          echo "PAIR PARAMS"
+          echo "=========================================="
+
+          if [ -f data/pair_params.json ]; then
+            cat data/pair_params.json
+          fi
+
+          echo ""
+          echo "=========================================="
+          echo "WALK FORWARD RESULTS"
+          echo "=========================================="
+
+          if [ -f data/walk_forward_results.json ]; then
+            cat data/walk_forward_results.json
+          fi
+
+          echo ""
+          echo "=========================================="
+          echo "ACTIVE PAIRS"
+          echo "=========================================="
+
+          if [ -f data/active_pairs.json ]; then
+            cat data/active_pairs.json
+          fi
+
+      # =====================================================
+      # SAVE RESULTS TO GITHUB
+      # =====================================================
 
       - name: Save results
         run: |
 
-          git config user.name "quantum-bot"
+          git config user.name \
+            "quantum-bot"
 
           git config user.email \
             "quantum-bot@users.noreply.github.com"
