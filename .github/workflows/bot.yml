@@ -52,7 +52,8 @@ jobs:
           cp config.json \
              user_data/configs/
 
-      - name: Calculate dates
+           - name: Calculate dates
+        shell: bash
         run: |
 
           python - <<'PY'
@@ -79,279 +80,33 @@ jobs:
               timedelta(days=90)
           )
 
+          train_start = train_start.strftime("%Y%m%d")
+          test_start = test_start.strftime("%Y%m%d")
+          test_end = test_end.strftime("%Y%m%d")
+
+          print("TRAIN_START:", train_start)
+          print("TEST_START :", test_start)
+          print("TEST_END   :", test_end)
+
           with open(
               "dates.env",
               "w"
           ) as f:
 
               f.write(
-                  "TRAIN_START="
-                  + train_start.strftime("%Y%m%d")
-                  + "\n"
+                  f"TRAIN_START={train_start}\n"
               )
 
               f.write(
-                  "TEST_START="
-                  + test_start.strftime("%Y%m%d")
-                  + "\n"
+                  f"TEST_START={test_start}\n"
               )
 
               f.write(
-                  "TEST_END="
-                  + test_end.strftime("%Y%m%d")
-                  + "\n"
+                  f"TEST_END={test_end}\n"
               )
-
-          print(
-              "TRAIN:",
-              train_start,
-              "-",
-              test_start
-          )
-
-          print(
-              "TEST:",
-              test_start,
-              "-",
-              test_end
-          )
 
           PY
 
           cat dates.env
 
-      - name: Scan
-        run: |
-
-          python scanner.py
-
-      - name: Build pair list
-        run: |
-
-          python - <<'PY'
-
-          import json
-
-          with open(
-              "data/candidate_pairs.json",
-              "r",
-              encoding="utf-8"
-          ) as f:
-
-              data = json.load(f)
-
-          pairs = data.get(
-              "pairs",
-              []
-          )
-
-          if not pairs:
-
-              raise SystemExit(
-                  "candidate_pairs.json boş!"
-              )
-
-          print(
-              f"{len(pairs)} coin bulundu."
-          )
-
-          with open(
-              "pairs.txt",
-              "w"
-          ) as f:
-
-              for pair in pairs:
-
-                  f.write(
-                      pair + "\n"
-                  )
-
-          PY
-
-          cat pairs.txt
-
-      - name: Download futures data
-        shell: bash
-        run: |
-
-          source dates.env
-
-          python - <<'PY'
-
-          import json
-          import subprocess
-          import os
-
-          from datetime import (
-              datetime,
-              timedelta
-          )
-
-
-          with open(
-              "data/candidate_pairs.json",
-              "r",
-              encoding="utf-8"
-          ) as f:
-
-              pairs = json.load(
-                  f
-              )["pairs"]
-
-
-          train_start = datetime.strptime(
-              os.environ["TRAIN_START"],
-              "%Y%m%d"
-          )
-
-          test_end = datetime.strptime(
-              os.environ["TEST_END"],
-              "%Y%m%d"
-          )
-
-
-          current = train_start
-
-
-          while current < test_end:
-
-              next_date = (
-                  current +
-                  timedelta(days=30)
-              )
-
-              if next_date > test_end:
-
-                  next_date = test_end
-
-
-              timerange = (
-                  current.strftime("%Y%m%d")
-                  + "-"
-                  + next_date.strftime("%Y%m%d")
-              )
-
-
-              print("")
-              print("=" * 70)
-              print(
-                  "DOWNLOAD:",
-                  timerange
-              )
-              print("=" * 70)
-
-
-              command = [
-
-                  "freqtrade",
-                  "download-data",
-
-                  "--config",
-                  "config.json",
-
-                  "--trading-mode",
-                  "futures",
-
-                  "--timeframes",
-                  "15m",
-
-                  "--timerange",
-                  timerange,
-
-                  "--pairs"
-              ]
-
-
-              command.extend(
-                  pairs
-              )
-
-
-              result = subprocess.run(
-                  command
-              )
-
-
-              if result.returncode != 0:
-
-                  raise SystemExit(
-                      "Data download failed."
-                  )
-
-
-              current = next_date
-
-          PY
-
-      - name: Verify data
-        run: |
-
-          find user_data/data \
-            -type f \
-            | head -100
-
-      - name: Optimize
-        run: |
-
-          source dates.env
-
-          python optimizer.py \
-            --timerange \
-            "${TRAIN_START}-${TEST_START}"
-
-      - name: Walk Forward Test
-        run: |
-
-          python walk_forward.py
-
-      - name: Lookahead check
-        run: |
-
-          source dates.env
-
-          freqtrade lookahead-analysis \
-            --config config.json \
-            --strategy QuantumMomentumStrategy \
-            --timerange \
-            "${TEST_START}-${TEST_END}" \
-            --pairs BTC/USDT:USDT \
-            --minimum-trade-amount 10 \
-            || true
-
-      - name: Show results
-        run: |
-
-          echo "=============================="
-          echo "PAIR PARAMS"
-          echo "=============================="
-
-          cat data/pair_params.json || true
-
-          echo "=============================="
-          echo "WALK FORWARD"
-          echo "=============================="
-
-          cat data/walk_forward_results.json || true
-
-          echo "=============================="
-          echo "ACTIVE PAIRS"
-          echo "=============================="
-
-          cat data/active_pairs.json || true
-
-      - name: Save results
-        run: |
-
-          git config user.name \
-            "quantum-bot"
-
-          git config user.email \
-            "quantum-bot@users.noreply.github.com"
-
-          git add data/
-
-          git diff --cached --quiet || \
-            git commit \
-            -m "Update walk-forward results"
-
-          git push
+          cat dates.env >> "$GITHUB_ENV"
