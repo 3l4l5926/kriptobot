@@ -1,6 +1,6 @@
 import json
-import re
 import subprocess
+import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -150,93 +150,80 @@ class PairSpecificStrategy(
         f.write(code)
 
 
-def parse_metrics(output):
+def load_latest_backtest_metrics(strategy_name="PairSpecificStrategy"):
+    """
+    NOT: Eskiden bu bilgi freqtrade'in konsola bastığı özet tablo
+    metninden regex ile çekiliyordu. Güncel freqtrade sürümleri
+    (2025+) bu tabloyu artık ASCII '|' ile değil, 'rich' kütüphanesiyle
+    Unicode kutu çizgileriyle basıyor ve satır başlıkları da değişti
+    (ör. "Total trades" yerine "Total/Daily Avg Trades" gibi birleşik
+    bir satır). Bu yüzden regex hiçbir zaman eşleşmiyordu, metrikler
+    hep 0 kalıyordu ve is_good() hiçbir zaman True dönmüyordu.
 
-    metrics = {
-        "trades": 0,
-        "profit_factor": 0.0,
-        "drawdown": 0.0,
-        "profit_percent": 0.0
+    Bunun yerine, freqtrade'in "--export signals --backtest-directory"
+    ile diske yazdığı yapılandırılmış sonucu (.last_result.json ->
+    backtest-result-<ts>.zip içindeki JSON) doğrudan okuyoruz. Bu,
+    konsol çıktısının formatından bağımsız ve çok daha güvenilir.
+    """
+
+    last_result_path = RESULT_DIR / ".last_result.json"
+
+    if not last_result_path.exists():
+        raise RuntimeError(
+            "Backtest sonuç dosyası (.last_result.json) bulunamadı. "
+            "freqtrade backtesting komutu sonuç export etmemiş olabilir."
+        )
+
+    with open(last_result_path, "r", encoding="utf-8") as f:
+        latest = json.load(f)
+
+    zip_name = latest.get("latest_backtest")
+
+    if not zip_name:
+        raise RuntimeError(
+            ".last_result.json içinde 'latest_backtest' bulunamadı."
+        )
+
+    zip_path = RESULT_DIR / zip_name
+
+    if not zip_path.exists():
+        raise RuntimeError(
+            f"Backtest sonuç zip dosyası yok: {zip_path}"
+        )
+
+    json_name = zip_path.stem + ".json"
+
+    with zipfile.ZipFile(zip_path) as zf:
+        with zf.open(json_name) as jf:
+            data = json.load(jf)
+
+    strat_results = data.get("strategy", {}).get(strategy_name)
+
+    if not strat_results:
+        raise RuntimeError(
+            f"'{strategy_name}' için sonuç bulunamadı "
+            f"(mevcut anahtarlar: {list(data.get('strategy', {}).keys())})."
+        )
+
+    trades = strat_results.get("total_trades", 0)
+
+    profit_factor = strat_results.get("profit_factor")
+    if profit_factor is None:
+        profit_factor = 0.0
+
+    drawdown = strat_results.get(
+        "max_drawdown_account",
+        strat_results.get("max_drawdown", 0.0)
+    )
+
+    profit_percent = strat_results.get("profit_total", 0.0) * 100
+
+    return {
+        "trades": trades,
+        "profit_factor": float(profit_factor),
+        "drawdown": float(drawdown),
+        "profit_percent": float(profit_percent)
     }
-
-    patterns = [
-        r"Total\s+trades\s*\|\s*(\d+)",
-        r"Total\s+trades\s*[:|]\s*(\d+)",
-        r"(\d+)\s+trades"
-    ]
-
-    for pattern in patterns:
-
-        match = re.search(
-            pattern,
-            output,
-            re.IGNORECASE
-        )
-
-        if match:
-            metrics["trades"] = int(
-                match.group(1)
-            )
-            break
-
-    patterns = [
-        r"Profit\s*Factor\s*\|\s*([0-9.]+)",
-        r"Profit\s*Factor\s*[:|]\s*([0-9.]+)"
-    ]
-
-    for pattern in patterns:
-
-        match = re.search(
-            pattern,
-            output,
-            re.IGNORECASE
-        )
-
-        if match:
-            metrics["profit_factor"] = float(
-                match.group(1)
-            )
-            break
-
-    patterns = [
-        r"Tot\s+Profit\s*%\s*\|\s*(-?[0-9.]+)",
-        r"Tot\s+Profit\s*%\s*[:|]\s*(-?[0-9.]+)"
-    ]
-
-    for pattern in patterns:
-
-        match = re.search(
-            pattern,
-            output,
-            re.IGNORECASE
-        )
-
-        if match:
-            metrics["profit_percent"] = float(
-                match.group(1)
-            )
-            break
-
-    patterns = [
-        r"Drawdown.*?\|\s*(-?[0-9.]+)\s*%",
-        r"Drawdown.*?(-?[0-9.]+)\s*%"
-    ]
-
-    for pattern in patterns:
-
-        match = re.search(
-            pattern,
-            output,
-            re.IGNORECASE
-        )
-
-        if match:
-            metrics["drawdown"] = (
-                abs(float(match.group(1))) / 100
-            )
-            break
-
-    return metrics
 
 
 def is_good(metrics):
@@ -323,7 +310,7 @@ def run_backtest(pair, timerange, params):
             f"Backtest başarısız: {pair}"
         )
 
-    return output
+    return load_latest_backtest_metrics()
 
 
 def main():
@@ -391,14 +378,10 @@ def main():
 
         try:
 
-            output = run_backtest(
+            metrics = run_backtest(
                 pair,
                 test_range,
                 params
-            )
-
-            metrics = parse_metrics(
-                output
             )
 
             good = is_good(
