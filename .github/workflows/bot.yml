@@ -27,8 +27,15 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          freqtrade create-userdir --userdir user_data
+          # Eğer user_data klasörü yoksa sıfırdan oluşturur
+          if [ ! -d "user_data" ]; then
+            freqtrade create-userdir --userdir user_data
+          fi
+          
+          # Gerekli alt klasörleri garantiye al ve dosyaları yerleştir
           mkdir -p user_data/strategies user_data/configs
           cp QuantumMomentumStrategy.py user_data/strategies/
           cp config.json user_data/configs/
+          
+          # Botu başlat
           freqtrade trade --strategy QuantumMomentumStrategy --config user_data/configs/config.json --userdir user_data
