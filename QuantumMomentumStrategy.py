@@ -1,12 +1,16 @@
 import json
-import os
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
 
 import pandas as pd
 import pandas_ta as ta
 
-from freqtrade.strategy import IStrategy
+from freqtrade.strategy import (
+    IStrategy,
+    IntParameter,
+    DecimalParameter,
+)
+from freqtrade.enums import RunMode
 
 
 class QuantumMomentumStrategy(IStrategy):
@@ -19,122 +23,167 @@ class QuantumMomentumStrategy(IStrategy):
 
     startup_candle_count = 100
 
-    # ============================================================
-    # GENEL GÜVENLİK AYARLARI
-    # ============================================================
+    # ---------------------------------------------------------
+    # Hyperopt parametreleri
+    # ---------------------------------------------------------
 
-    # ROI'yi bilinçli olarak devre dışı bırakıyoruz.
-    # Çıkışları ATR tabanlı custom_exit yönetecek.
+    buy_rsi = IntParameter(
+        35,
+        55,
+        default=45,
+        space="buy"
+    )
+
+    short_rsi = IntParameter(
+        45,
+        65,
+        default=55,
+        space="buy"
+    )
+
+    trend_adx = IntParameter(
+        20,
+        40,
+        default=30,
+        space="buy"
+    )
+
+    sl_multiplier = DecimalParameter(
+        1.2,
+        4.0,
+        decimals=3,
+        default=2.2,
+        space="sell"
+    )
+
+    tp_multiplier = DecimalParameter(
+        2.5,
+        8.0,
+        decimals=3,
+        default=5.0,
+        space="sell"
+    )
+
+    # ---------------------------------------------------------
+    # ROI / acil stop
+    # ---------------------------------------------------------
+
     minimal_roi = {
         "0": 100.0
     }
 
-    # Acil durum stoploss.
-    # Asıl SL daha sonra ATR sistemi tarafından hesaplanacak.
     stoploss = -0.99
 
     use_custom_stoploss = False
 
-    # ============================================================
-    # PARAMETRE DOSYASI
-    # ============================================================
+    # ---------------------------------------------------------
+    # Dosyalar
+    # ---------------------------------------------------------
 
     PARAM_FILE = Path(
-        os.environ.get(
-            "QUANTUM_PARAMS_FILE",
-            "user_data/configs/pair_params.json"
-        )
+        "data/pair_params.json"
     )
 
     DEFAULT_PARAMS = {
-        "buy_rsi": 41,
-        "short_rsi": 56,
-        "trend_adx": 32,
-        "sl_multiplier": 2.228,
-        "tp_multiplier": 6.036
+        "buy_rsi": 45,
+        "short_rsi": 55,
+        "trend_adx": 30,
+        "sl_multiplier": 2.2,
+        "tp_multiplier": 5.0,
     }
 
-    _pair_params_cache = None
+    _params_cache = None
 
-    # ============================================================
-    # PARAMETRELERİ YÜKLE
-    # ============================================================
+    # =========================================================
+    # PARAMETRE DOSYASINI OKU
+    # =========================================================
 
     @classmethod
     def load_pair_params(cls):
 
-        if cls._pair_params_cache is not None:
-            return cls._pair_params_cache
+        if cls._params_cache is not None:
+            return cls._params_cache
+
+        if not cls.PARAM_FILE.exists():
+            cls._params_cache = {}
+            return cls._params_cache
 
         try:
 
-            if cls.PARAM_FILE.exists():
+            with open(
+                cls.PARAM_FILE,
+                "r",
+                encoding="utf-8"
+            ) as f:
 
-                with open(cls.PARAM_FILE, "r", encoding="utf-8") as f:
-                    cls._pair_params_cache = json.load(f)
+                cls._params_cache = json.load(f)
 
-            else:
+        except Exception:
 
-                cls._pair_params_cache = {}
+            cls._params_cache = {}
 
-        except Exception as e:
+        return cls._params_cache
 
-            print(
-                f"[QuantumMomentumStrategy] "
-                f"Parametre dosyası okunamadı: {e}"
-            )
+    # =========================================================
+    # COIN PARAMETRELERİ
+    # =========================================================
 
-            cls._pair_params_cache = {}
+    def get_pair_params(self, pair):
 
-        return cls._pair_params_cache
+        # Hyperopt sırasında gerçek pair parametresini
+        # kullanma.
+        #
+        # Hyperopt kendi parametrelerini optimize etmeli.
 
-    # ============================================================
-    # COIN'E ÖZEL PARAMETRE
-    # ============================================================
+        try:
+            if self.config["runmode"].value == RunMode.HYPEROPT:
 
-    def get_params(self, pair):
+                return {
+                    "buy_rsi": self.buy_rsi.value,
+                    "short_rsi": self.short_rsi.value,
+                    "trend_adx": self.trend_adx.value,
+                    "sl_multiplier": float(
+                        self.sl_multiplier.value
+                    ),
+                    "tp_multiplier": float(
+                        self.tp_multiplier.value
+                    ),
+                }
 
-        all_params = self.load_pair_params()
+        except Exception:
+            pass
 
-        # --------------------------------------------------------
-        # Önce tam pair ismini ara
-        # Örn:
-        # ETH/USDT:USDT
-        # --------------------------------------------------------
+        # -----------------------------------------------------
+        # Normal / dry-run / live
+        # -----------------------------------------------------
 
-        if pair in all_params:
+        params = self.load_pair_params()
 
-            params = all_params[pair]
+        if pair in params:
 
-            return {
-                **self.DEFAULT_PARAMS,
-                **params
-            }
+            result = self.DEFAULT_PARAMS.copy()
 
-        # --------------------------------------------------------
-        # :USDT kısmı olmadan da kontrol et
-        # --------------------------------------------------------
+            result.update(params[pair])
+
+            return result
+
+        # :USDT kısmını kaldırarak tekrar dene
 
         clean_pair = pair.replace(":USDT", "")
 
-        if clean_pair in all_params:
+        if clean_pair in params:
 
-            params = all_params[clean_pair]
+            result = self.DEFAULT_PARAMS.copy()
 
-            return {
-                **self.DEFAULT_PARAMS,
-                **params
-            }
+            result.update(params[clean_pair])
 
-        # --------------------------------------------------------
-        # Coin için özel parametre yoksa default kullan
-        # --------------------------------------------------------
+            return result
 
         return self.DEFAULT_PARAMS.copy()
 
-    # ============================================================
-    # GÖSTERGELER
-    # ============================================================
+    # =========================================================
+    # INDICATORS
+    # =========================================================
 
     def populate_indicators(
         self,
@@ -142,7 +191,6 @@ class QuantumMomentumStrategy(IStrategy):
         metadata: dict
     ) -> pd.DataFrame:
 
-        # EMA
         dataframe["ema_50"] = ta.ema(
             dataframe["close"],
             length=50
@@ -153,33 +201,33 @@ class QuantumMomentumStrategy(IStrategy):
             length=100
         )
 
-        # MACD
         macd = ta.macd(
             dataframe["close"]
         )
 
-        dataframe["macd"] = macd["MACD_12_26_9"]
+        dataframe["macd"] = macd[
+            "MACD_12_26_9"
+        ]
 
         dataframe["macdsignal"] = macd[
             "MACDs_12_26_9"
         ]
 
-        # RSI
         dataframe["rsi"] = ta.rsi(
             dataframe["close"],
             length=14
         )
 
-        # ADX
         adx = ta.adx(
             dataframe["high"],
             dataframe["low"],
             dataframe["close"]
         )
 
-        dataframe["adx"] = adx["ADX_14"]
+        dataframe["adx"] = adx[
+            "ADX_14"
+        ]
 
-        # ATR
         dataframe["atr"] = ta.atr(
             dataframe["high"],
             dataframe["low"],
@@ -189,9 +237,9 @@ class QuantumMomentumStrategy(IStrategy):
 
         return dataframe
 
-    # ============================================================
-    # LONG / SHORT GİRİŞLERİ
-    # ============================================================
+    # =========================================================
+    # ENTRY
+    # =========================================================
 
     def populate_entry_trend(
         self,
@@ -201,17 +249,23 @@ class QuantumMomentumStrategy(IStrategy):
 
         pair = metadata["pair"]
 
-        params = self.get_params(pair)
+        params = self.get_pair_params(pair)
 
-        buy_rsi = params["buy_rsi"]
+        buy_rsi = float(
+            params["buy_rsi"]
+        )
 
-        short_rsi = params["short_rsi"]
+        short_rsi = float(
+            params["short_rsi"]
+        )
 
-        trend_adx = params["trend_adx"]
+        trend_adx = float(
+            params["trend_adx"]
+        )
 
-        # --------------------------------------------------------
+        # -----------------------------------------------------
         # LONG
-        # --------------------------------------------------------
+        # -----------------------------------------------------
 
         long_condition = (
             (dataframe["ema_50"] > dataframe["ema_100"])
@@ -225,15 +279,17 @@ class QuantumMomentumStrategy(IStrategy):
 
         dataframe.loc[
             long_condition,
-            ["enter_long", "enter_tag"]
-        ] = (
-            1,
-            "Long_Sinyali"
-        )
+            "enter_long"
+        ] = 1
 
-        # --------------------------------------------------------
+        dataframe.loc[
+            long_condition,
+            "enter_tag"
+        ] = "Long_Quantum"
+
+        # -----------------------------------------------------
         # SHORT
-        # --------------------------------------------------------
+        # -----------------------------------------------------
 
         short_condition = (
             (dataframe["ema_50"] < dataframe["ema_100"])
@@ -247,17 +303,19 @@ class QuantumMomentumStrategy(IStrategy):
 
         dataframe.loc[
             short_condition,
-            ["enter_short", "enter_tag"]
-        ] = (
-            1,
-            "Short_Sinyali"
-        )
+            "enter_short"
+        ] = 1
+
+        dataframe.loc[
+            short_condition,
+            "enter_tag"
+        ] = "Short_Quantum"
 
         return dataframe
 
-    # ============================================================
-    # NORMAL EXIT SİNYALİ
-    # ============================================================
+    # =========================================================
+    # EXIT SIGNAL
+    # =========================================================
 
     def populate_exit_trend(
         self,
@@ -271,9 +329,9 @@ class QuantumMomentumStrategy(IStrategy):
 
         return dataframe
 
-    # ============================================================
-    # ATR TABANLI TP / SL
-    # ============================================================
+    # =========================================================
+    # ATR EXIT
+    # =========================================================
 
     def custom_exit(
         self,
@@ -285,7 +343,7 @@ class QuantumMomentumStrategy(IStrategy):
         **kwargs
     ):
 
-        params = self.get_params(pair)
+        params = self.get_pair_params(pair)
 
         sl_multiplier = float(
             params["sl_multiplier"]
@@ -300,12 +358,11 @@ class QuantumMomentumStrategy(IStrategy):
             self.timeframe
         )
 
-        if dataframe is None or dataframe.empty:
+        if dataframe is None:
             return None
 
-        # --------------------------------------------------------
-        # İşleme giriş yapılan zamana en yakın mumu bul
-        # --------------------------------------------------------
+        if dataframe.empty:
+            return None
 
         entry_candles = dataframe[
             dataframe["date"] <= trade.open_date_utc
@@ -318,14 +375,17 @@ class QuantumMomentumStrategy(IStrategy):
 
         entry_atr = entry_candle["atr"]
 
-        if pd.isna(entry_atr) or entry_atr <= 0:
+        if pd.isna(entry_atr):
+            return None
+
+        if entry_atr <= 0:
             return None
 
         entry_price = trade.open_rate
 
-        # ========================================================
+        # -----------------------------------------------------
         # SHORT
-        # ========================================================
+        # -----------------------------------------------------
 
         if trade.is_short:
 
@@ -349,9 +409,9 @@ class QuantumMomentumStrategy(IStrategy):
 
                 return "Short_ATR_TP"
 
-        # ========================================================
+        # -----------------------------------------------------
         # LONG
-        # ========================================================
+        # -----------------------------------------------------
 
         else:
 
