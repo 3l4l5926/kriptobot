@@ -64,9 +64,5 @@
         "stoploss": "market",
         "stoploss_on_exchange": false
     },
-    "telegram": {
-        "enabled": true,
-        "token": "${env:TELEGRAM_TOKEN}",
-        "chat_id": "${env:TELEGRAM_CHAT_ID}"
-    }
+    
 }
