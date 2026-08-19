@@ -1,0 +1,127 @@
+{
+  "pairs": [
+    "ETH/USDT:USDT",
+    "BTC/USDT:USDT",
+    "SNDK/USDT:USDT",
+    "SKHYNIX/USDT:USDT",
+    "SOL/USDT:USDT",
+    "XAU/USDT:USDT",
+    "SPCX/USDT:USDT",
+    "MU/USDT:USDT",
+    "XRP/USDT:USDT",
+    "SOXL/USDT:USDT",
+    "BTW/USDT:USDT",
+    "UNITREE/USDT:USDT",
+    "SKHY/USDT:USDT",
+    "DRAM/USDT:USDT",
+    "ACE/USDT:USDT",
+    "XAG/USDT:USDT",
+    "QQQX/USDT:USDT",
+    "SNXX/USDT:USDT",
+    "DOGE/USDT:USDT",
+    "HYPE/USDT:USDT"
+  ],
+  "count": 20,
+  "pairs_detail": [
+    {
+      "pair": "ETH/USDT:USDT",
+      "quote_volume": 4718015783.0,
+      "last": 2087.04
+    },
+    {
+      "pair": "BTC/USDT:USDT",
+      "quote_volume": 4167066340.0,
+      "last": 68271.3
+    },
+    {
+      "pair": "SNDK/USDT:USDT",
+      "quote_volume": 3573445124.0,
+      "last": 1551.73
+    },
+    {
+      "pair": "SKHYNIX/USDT:USDT",
+      "quote_volume": 618796812.0,
+      "last": 1134.61
+    },
+    {
+      "pair": "SOL/USDT:USDT",
+      "quote_volume": 282156515.0,
+      "last": 81.56
+    },
+    {
+      "pair": "XAU/USDT:USDT",
+      "quote_volume": 224378434.0,
+      "last": 4483.83
+    },
+    {
+      "pair": "SPCX/USDT:USDT",
+      "quote_volume": 206695721.0,
+      "last": 140.09
+    },
+    {
+      "pair": "MU/USDT:USDT",
+      "quote_volume": 104059196.0,
+      "last": 924.34
+    },
+    {
+      "pair": "XRP/USDT:USDT",
+      "quote_volume": 96416946.0,
+      "last": 1.0614
+    },
+    {
+      "pair": "SOXL/USDT:USDT",
+      "quote_volume": 93589617.0,
+      "last": 119.46
+    },
+    {
+      "pair": "BTW/USDT:USDT",
+      "quote_volume": 85620376.0,
+      "last": 0.375204
+    },
+    {
+      "pair": "UNITREE/USDT:USDT",
+      "quote_volume": 56985708.0,
+      "last": 112.38
+    },
+    {
+      "pair": "SKHY/USDT:USDT",
+      "quote_volume": 50541495.0,
+      "last": 157.11
+    },
+    {
+      "pair": "DRAM/USDT:USDT",
+      "quote_volume": 49982253.0,
+      "last": 54.75
+    },
+    {
+      "pair": "ACE/USDT:USDT",
+      "quote_volume": 47767192.0,
+      "last": 0.1865
+    },
+    {
+      "pair": "XAG/USDT:USDT",
+      "quote_volume": 44776509.0,
+      "last": 65.67
+    },
+    {
+      "pair": "QQQX/USDT:USDT",
+      "quote_volume": 44488109.0,
+      "last": 716.25
+    },
+    {
+      "pair": "SNXX/USDT:USDT",
+      "quote_volume": 43222037.0,
+      "last": 14.189
+    },
+    {
+      "pair": "DOGE/USDT:USDT",
+      "quote_volume": 37432458.0,
+      "last": 0.07255
+    },
+    {
+      "pair": "HYPE/USDT:USDT",
+      "quote_volume": 33464657.0,
+      "last": 62.174
+    }
+  ]
+}
