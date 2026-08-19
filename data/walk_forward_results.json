@@ -10,13 +10,13 @@
       "tp_multiplier": 7.928
     },
     "metrics": {
-      "trades": 1,
-      "profit_factor": 0.58,
+      "trades": 0,
+      "profit_factor": 0.0,
       "drawdown": 0.0016,
-      "profit_percent": -0.07
+      "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:47:55.383310+00:00"
+    "updated_at": "2026-08-19T20:11:14.021304+00:00"
   },
   "BTC/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -29,13 +29,13 @@
       "tp_multiplier": 7.492
     },
     "metrics": {
-      "trades": 1,
+      "trades": 0,
       "profit_factor": 0.0,
       "drawdown": 0.0008,
-      "profit_percent": -0.08
+      "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:48:04.214908+00:00"
+    "updated_at": "2026-08-19T20:11:25.386597+00:00"
   },
   "SOL/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -48,13 +48,13 @@
       "tp_multiplier": 6.395
     },
     "metrics": {
-      "trades": 1,
+      "trades": 0,
       "profit_factor": 0.0,
       "drawdown": 0.0012,
-      "profit_percent": -0.12
+      "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:48:13.339086+00:00"
+    "updated_at": "2026-08-19T20:11:37.036385+00:00"
   },
   "XRP/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -67,13 +67,13 @@
       "tp_multiplier": 3.137
     },
     "metrics": {
-      "trades": 1,
-      "profit_factor": 0.23,
+      "trades": 0,
+      "profit_factor": 0.0,
       "drawdown": 0.005600000000000001,
-      "profit_percent": -0.56
+      "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:48:22.939985+00:00"
+    "updated_at": "2026-08-19T20:11:48.759279+00:00"
   },
   "BTW/USDT:USDT": {
     "train_timerange": "20260421-20260720",
@@ -86,12 +86,12 @@
       "tp_multiplier": 3.137
     },
     "metrics": {
-      "trades": 1,
-      "profit_factor": 1.67,
+      "trades": 0,
+      "profit_factor": 0.0,
       "drawdown": 0.0167,
-      "profit_percent": 2.55
+      "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-08-19T19:48:32.688950+00:00"
+    "updated_at": "2026-08-19T20:12:00.518207+00:00"
   }
 }
