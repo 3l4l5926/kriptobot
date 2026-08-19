@@ -1,0 +1,37 @@
+{
+  "ETH/USDT:USDT": {
+    "buy_rsi": 45,
+    "short_rsi": 55,
+    "trend_adx": 30,
+    "sl_multiplier": 2.2,
+    "tp_multiplier": 5.0
+  },
+  "BTC/USDT:USDT": {
+    "buy_rsi": 45,
+    "short_rsi": 55,
+    "trend_adx": 30,
+    "sl_multiplier": 2.2,
+    "tp_multiplier": 5.0
+  },
+  "SOL/USDT:USDT": {
+    "buy_rsi": 45,
+    "short_rsi": 55,
+    "trend_adx": 30,
+    "sl_multiplier": 2.2,
+    "tp_multiplier": 5.0
+  },
+  "XRP/USDT:USDT": {
+    "buy_rsi": 45,
+    "short_rsi": 55,
+    "trend_adx": 30,
+    "sl_multiplier": 2.2,
+    "tp_multiplier": 5.0
+  },
+  "BTW/USDT:USDT": {
+    "buy_rsi": 45,
+    "short_rsi": 55,
+    "trend_adx": 30,
+    "sl_multiplier": 2.2,
+    "tp_multiplier": 5.0
+  }
+}
