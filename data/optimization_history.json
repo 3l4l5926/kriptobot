@@ -1,7 +1,7 @@
 [
   {
     "pair": "ETH/USDT:USDT",
-    "train_timerange": "20260421-20260720",
+    "train_timerange": "20260425-20260724",
     "params": {
       "buy_rsi": 37,
       "short_rsi": 59,
@@ -12,7 +12,7 @@
   },
   {
     "pair": "BTC/USDT:USDT",
-    "train_timerange": "20260421-20260720",
+    "train_timerange": "20260425-20260724",
     "params": {
       "buy_rsi": 43,
       "short_rsi": 49,
@@ -23,35 +23,35 @@
   },
   {
     "pair": "SOL/USDT:USDT",
-    "train_timerange": "20260421-20260720",
+    "train_timerange": "20260425-20260724",
     "params": {
-      "buy_rsi": 43,
-      "short_rsi": 62,
-      "trend_adx": 38,
-      "sl_multiplier": 1.219,
-      "tp_multiplier": 5.309
+      "buy_rsi": 35,
+      "short_rsi": 60,
+      "trend_adx": 26,
+      "sl_multiplier": 1.378,
+      "tp_multiplier": 3.807
     }
   },
   {
     "pair": "XRP/USDT:USDT",
-    "train_timerange": "20260421-20260720",
+    "train_timerange": "20260425-20260724",
     "params": {
-      "buy_rsi": 38,
-      "short_rsi": 46,
-      "trend_adx": 38,
-      "sl_multiplier": 2.883,
-      "tp_multiplier": 6.395
+      "buy_rsi": 35,
+      "short_rsi": 49,
+      "trend_adx": 30,
+      "sl_multiplier": 1.344,
+      "tp_multiplier": 4.032
     }
   },
   {
-    "pair": "BTW/USDT:USDT",
-    "train_timerange": "20260421-20260720",
+    "pair": "TRUMP/USDT:USDT",
+    "train_timerange": "20260425-20260724",
     "params": {
-      "buy_rsi": 51,
+      "buy_rsi": 38,
       "short_rsi": 51,
-      "trend_adx": 22,
-      "sl_multiplier": 3.116,
-      "tp_multiplier": 4.921
+      "trend_adx": 31,
+      "sl_multiplier": 2.409,
+      "tp_multiplier": 4.102
     }
   }
 ]
