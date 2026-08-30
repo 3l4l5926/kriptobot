@@ -3,35 +3,35 @@
     "ETH/USDT:USDT",
     "BTC/USDT:USDT",
     "SOL/USDT:USDT",
-    "XRP/USDT:USDT",
-    "TRUMP/USDT:USDT"
+    "BTR/USDT:USDT",
+    "ZEC/USDT:USDT"
   ],
   "count": 5,
   "pairs_detail": [
     {
       "pair": "ETH/USDT:USDT",
-      "quote_volume": 3278142466.0,
-      "last": 2408.92
+      "quote_volume": 1264724403.0,
+      "last": 2453.74
     },
     {
       "pair": "BTC/USDT:USDT",
-      "quote_volume": 2304527189.0,
-      "last": 76850.0
+      "quote_volume": 1094477053.0,
+      "last": 77998.8
     },
     {
       "pair": "SOL/USDT:USDT",
-      "quote_volume": 541990852.0,
-      "last": 93.5
+      "quote_volume": 285210082.0,
+      "last": 104.47
     },
     {
-      "pair": "XRP/USDT:USDT",
-      "quote_volume": 462447663.0,
-      "last": 1.4636
+      "pair": "BTR/USDT:USDT",
+      "quote_volume": 72965061.0,
+      "last": 0.19014
     },
     {
-      "pair": "TRUMP/USDT:USDT",
-      "quote_volume": 233418796.0,
-      "last": 2.232
+      "pair": "ZEC/USDT:USDT",
+      "quote_volume": 69464864.0,
+      "last": 832.0
     }
   ]
 }
