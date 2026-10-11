@@ -1,51 +1,51 @@
 {
   "ETH/USDT:USDT": {
-    "train_timerange": "20260606-20260904",
-    "test_timerange": "20260904-20261004",
+    "train_timerange": "20260613-20260911",
+    "test_timerange": "20260911-20261011",
     "params": {
-      "buy_rsi": 37,
-      "short_rsi": 59,
-      "trend_adx": 20,
+      "buy_rsi": 55,
+      "short_rsi": 61,
+      "trend_adx": 23,
+      "sl_multiplier": 3.706,
+      "tp_multiplier": 5.789
+    },
+    "metrics": {
+      "trades": 5,
+      "profit_factor": 0.634388503018038,
+      "drawdown": 0.00348923362000005,
+      "profit_percent": -0.16108939699999997
+    },
+    "active": false,
+    "updated_at": "2026-10-11T09:38:08.331910+00:00"
+  },
+  "BTC/USDT:USDT": {
+    "train_timerange": "20260613-20260911",
+    "test_timerange": "20260911-20261011",
+    "params": {
+      "buy_rsi": 43,
+      "short_rsi": 49,
+      "trend_adx": 37,
       "sl_multiplier": 3.744,
-      "tp_multiplier": 6.741
+      "tp_multiplier": 2.755
     },
     "metrics": {
       "trades": 2,
-      "profit_factor": 0.0,
-      "drawdown": 0.0,
-      "profit_percent": 0.7886471730000001
+      "profit_factor": 0.6699890433425738,
+      "drawdown": 0.0009357598399999461,
+      "profit_percent": -0.030881100000000005
     },
     "active": false,
-    "updated_at": "2026-10-04T09:18:27.138040+00:00"
-  },
-  "BTC/USDT:USDT": {
-    "train_timerange": "20260606-20260904",
-    "test_timerange": "20260904-20261004",
-    "params": {
-      "buy_rsi": 51,
-      "short_rsi": 48,
-      "trend_adx": 39,
-      "sl_multiplier": 1.871,
-      "tp_multiplier": 3.297
-    },
-    "metrics": {
-      "trades": 3,
-      "profit_factor": 0.45121773127823134,
-      "drawdown": 0.0013894596699999511,
-      "profit_percent": -0.076251083
-    },
-    "active": false,
-    "updated_at": "2026-10-04T09:18:51.073415+00:00"
+    "updated_at": "2026-10-11T09:38:19.792683+00:00"
   },
   "SOL/USDT:USDT": {
-    "train_timerange": "20260606-20260904",
-    "test_timerange": "20260904-20261004",
+    "train_timerange": "20260613-20260911",
+    "test_timerange": "20260911-20261011",
     "params": {
-      "buy_rsi": 51,
+      "buy_rsi": 41,
       "short_rsi": 60,
-      "trend_adx": 22,
-      "sl_multiplier": 3.484,
-      "tp_multiplier": 4.921
+      "trend_adx": 33,
+      "sl_multiplier": 3.685,
+      "tp_multiplier": 5.097
     },
     "metrics": {
       "trades": 0,
@@ -54,44 +54,44 @@
       "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-10-04T09:19:08.695713+00:00"
+    "updated_at": "2026-10-11T09:38:30.491568+00:00"
   },
-  "ZEC/USDT:USDT": {
-    "train_timerange": "20260606-20260904",
-    "test_timerange": "20260904-20261004",
+  "STRK/USDT:USDT": {
+    "train_timerange": "20260613-20260911",
+    "test_timerange": "20260911-20261011",
     "params": {
-      "buy_rsi": 47,
-      "short_rsi": 59,
-      "trend_adx": 21,
-      "sl_multiplier": 3.857,
-      "tp_multiplier": 7.811
+      "buy_rsi": 38,
+      "short_rsi": 46,
+      "trend_adx": 38,
+      "sl_multiplier": 2.883,
+      "tp_multiplier": 6.395
     },
     "metrics": {
-      "trades": 7,
-      "profit_factor": 0.709685519502749,
-      "drawdown": 0.01773129124757118,
-      "profit_percent": -0.517745784
+      "trades": 0,
+      "profit_factor": 0.0,
+      "drawdown": 0.0,
+      "profit_percent": 0.0
     },
     "active": false,
-    "updated_at": "2026-10-04T09:19:31.283746+00:00"
+    "updated_at": "2026-10-11T09:38:41.545732+00:00"
   },
   "XRP/USDT:USDT": {
-    "train_timerange": "20260606-20260904",
-    "test_timerange": "20260904-20261004",
+    "train_timerange": "20260613-20260911",
+    "test_timerange": "20260911-20261011",
     "params": {
-      "buy_rsi": 35,
-      "short_rsi": 56,
-      "trend_adx": 35,
-      "sl_multiplier": 1.344,
-      "tp_multiplier": 4.032
+      "buy_rsi": 46,
+      "short_rsi": 47,
+      "trend_adx": 36,
+      "sl_multiplier": 3.744,
+      "tp_multiplier": 3.817
     },
     "metrics": {
-      "trades": 1,
+      "trades": 2,
       "profit_factor": 0.0,
-      "drawdown": 0.000777661500000022,
-      "profit_percent": -0.07776614999999999
+      "drawdown": 0.005652019600000017,
+      "profit_percent": -0.56520196
     },
     "active": false,
-    "updated_at": "2026-10-04T09:19:49.054529+00:00"
+    "updated_at": "2026-10-11T09:38:52.899299+00:00"
   }
 }

@@ -1,57 +1,57 @@
 [
   {
     "pair": "ETH/USDT:USDT",
-    "train_timerange": "20260606-20260904",
+    "train_timerange": "20260613-20260911",
     "params": {
-      "buy_rsi": 37,
-      "short_rsi": 59,
-      "trend_adx": 20,
-      "sl_multiplier": 3.744,
-      "tp_multiplier": 6.741
+      "buy_rsi": 55,
+      "short_rsi": 61,
+      "trend_adx": 23,
+      "sl_multiplier": 3.706,
+      "tp_multiplier": 5.789
     }
   },
   {
     "pair": "BTC/USDT:USDT",
-    "train_timerange": "20260606-20260904",
+    "train_timerange": "20260613-20260911",
     "params": {
-      "buy_rsi": 51,
-      "short_rsi": 48,
-      "trend_adx": 39,
-      "sl_multiplier": 1.871,
-      "tp_multiplier": 3.297
+      "buy_rsi": 43,
+      "short_rsi": 49,
+      "trend_adx": 37,
+      "sl_multiplier": 3.744,
+      "tp_multiplier": 2.755
     }
   },
   {
     "pair": "SOL/USDT:USDT",
-    "train_timerange": "20260606-20260904",
+    "train_timerange": "20260613-20260911",
     "params": {
-      "buy_rsi": 51,
+      "buy_rsi": 41,
       "short_rsi": 60,
-      "trend_adx": 22,
-      "sl_multiplier": 3.484,
-      "tp_multiplier": 4.921
+      "trend_adx": 33,
+      "sl_multiplier": 3.685,
+      "tp_multiplier": 5.097
     }
   },
   {
-    "pair": "ZEC/USDT:USDT",
-    "train_timerange": "20260606-20260904",
+    "pair": "STRK/USDT:USDT",
+    "train_timerange": "20260613-20260911",
     "params": {
-      "buy_rsi": 47,
-      "short_rsi": 59,
-      "trend_adx": 21,
-      "sl_multiplier": 3.857,
-      "tp_multiplier": 7.811
+      "buy_rsi": 38,
+      "short_rsi": 46,
+      "trend_adx": 38,
+      "sl_multiplier": 2.883,
+      "tp_multiplier": 6.395
     }
   },
   {
     "pair": "XRP/USDT:USDT",
-    "train_timerange": "20260606-20260904",
+    "train_timerange": "20260613-20260911",
     "params": {
-      "buy_rsi": 35,
-      "short_rsi": 56,
-      "trend_adx": 35,
-      "sl_multiplier": 1.344,
-      "tp_multiplier": 4.032
+      "buy_rsi": 46,
+      "short_rsi": 47,
+      "trend_adx": 36,
+      "sl_multiplier": 3.744,
+      "tp_multiplier": 3.817
     }
   }
 ]
