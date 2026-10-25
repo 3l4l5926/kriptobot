@@ -1,26 +1,26 @@
 {
   "ETH/USDT:USDT": {
-    "train_timerange": "20260620-20260918",
-    "test_timerange": "20260918-20261018",
+    "train_timerange": "20260627-20260925",
+    "test_timerange": "20260925-20261025",
     "params": {
-      "buy_rsi": 43,
-      "short_rsi": 53,
-      "trend_adx": 38,
-      "sl_multiplier": 3.744,
-      "tp_multiplier": 2.923
+      "buy_rsi": 36,
+      "short_rsi": 62,
+      "trend_adx": 26,
+      "sl_multiplier": 3.706,
+      "tp_multiplier": 3.526
     },
     "metrics": {
-      "trades": 1,
-      "profit_factor": 0.0,
-      "drawdown": 0.0,
-      "profit_percent": 0.09841504400000001
+      "trades": 3,
+      "profit_factor": 2.093583054092261,
+      "drawdown": 0.0013380269553332567,
+      "profit_percent": 0.146735406
     },
-    "active": false,
-    "updated_at": "2026-10-18T07:44:35.012659+00:00"
+    "active": true,
+    "updated_at": "2026-10-25T08:02:40.510579+00:00"
   },
   "BTC/USDT:USDT": {
-    "train_timerange": "20260620-20260918",
-    "test_timerange": "20260918-20261018",
+    "train_timerange": "20260627-20260925",
+    "test_timerange": "20260925-20261025",
     "params": {
       "buy_rsi": 35,
       "short_rsi": 55,
@@ -29,36 +29,36 @@
       "tp_multiplier": 7.492
     },
     "metrics": {
-      "trades": 3,
-      "profit_factor": 0.9067172714306144,
-      "drawdown": 0.0008714568200000485,
-      "profit_percent": -0.008129186999999993
+      "trades": 4,
+      "profit_factor": 0.0,
+      "drawdown": 0.0028605582999999797,
+      "profit_percent": -0.28605583
     },
     "active": false,
-    "updated_at": "2026-10-18T07:44:52.991097+00:00"
+    "updated_at": "2026-10-25T08:02:50.977771+00:00"
   },
   "SOL/USDT:USDT": {
-    "train_timerange": "20260620-20260918",
-    "test_timerange": "20260918-20261018",
+    "train_timerange": "20260627-20260925",
+    "test_timerange": "20260925-20261025",
     "params": {
-      "buy_rsi": 55,
+      "buy_rsi": 51,
       "short_rsi": 63,
-      "trend_adx": 30,
-      "sl_multiplier": 3.539,
-      "tp_multiplier": 4.066
+      "trend_adx": 26,
+      "sl_multiplier": 1.508,
+      "tp_multiplier": 3.753
     },
     "metrics": {
-      "trades": 0,
+      "trades": 2,
       "profit_factor": 0.0,
-      "drawdown": 0.0,
-      "profit_percent": 0.0
+      "drawdown": 0.0015385877799999434,
+      "profit_percent": -0.153858778
     },
     "active": false,
-    "updated_at": "2026-10-18T07:45:13.062361+00:00"
+    "updated_at": "2026-10-25T08:03:01.853177+00:00"
   },
   "ZEC/USDT:USDT": {
-    "train_timerange": "20260620-20260918",
-    "test_timerange": "20260918-20261018",
+    "train_timerange": "20260627-20260925",
+    "test_timerange": "20260925-20261025",
     "params": {
       "buy_rsi": 53,
       "short_rsi": 61,
@@ -67,31 +67,31 @@
       "tp_multiplier": 5.466
     },
     "metrics": {
-      "trades": 8,
-      "profit_factor": 1.2257818532356117,
-      "drawdown": 0.012458866017888178,
-      "profit_percent": 0.3392416999999998
+      "trades": 10,
+      "profit_factor": 1.0516001608222665,
+      "drawdown": 0.012523757614272952,
+      "profit_percent": 0.09979180300000001
     },
-    "active": true,
-    "updated_at": "2026-10-18T07:45:29.270670+00:00"
+    "active": false,
+    "updated_at": "2026-10-25T08:03:12.743095+00:00"
   },
-  "Q/USDT:USDT": {
-    "train_timerange": "20260620-20260918",
-    "test_timerange": "20260918-20261018",
+  "DOGE/USDT:USDT": {
+    "train_timerange": "20260627-20260925",
+    "test_timerange": "20260925-20261025",
     "params": {
-      "buy_rsi": 38,
-      "short_rsi": 46,
-      "trend_adx": 38,
-      "sl_multiplier": 2.883,
-      "tp_multiplier": 6.395
+      "buy_rsi": 51,
+      "short_rsi": 65,
+      "trend_adx": 37,
+      "sl_multiplier": 1.794,
+      "tp_multiplier": 3.5
     },
     "metrics": {
       "trades": 1,
       "profit_factor": 0.0,
-      "drawdown": 0.0046306591999999685,
-      "profit_percent": -0.4630659200000001
+      "drawdown": 0.0,
+      "profit_percent": 0.158688416
     },
     "active": false,
-    "updated_at": "2026-10-18T07:45:46.383914+00:00"
+    "updated_at": "2026-10-25T08:03:23.642291+00:00"
   }
 }
