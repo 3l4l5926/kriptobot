@@ -1,83 +1,83 @@
 {
   "ETH/USDT:USDT": {
-    "train_timerange": "20260627-20260925",
-    "test_timerange": "20260925-20261025",
+    "train_timerange": "20260704-20261002",
+    "test_timerange": "20261002-20261101",
     "params": {
-      "buy_rsi": 36,
-      "short_rsi": 62,
-      "trend_adx": 26,
-      "sl_multiplier": 3.706,
-      "tp_multiplier": 3.526
-    },
-    "metrics": {
-      "trades": 3,
-      "profit_factor": 2.093583054092261,
-      "drawdown": 0.0013380269553332567,
-      "profit_percent": 0.146735406
-    },
-    "active": true,
-    "updated_at": "2026-10-25T08:02:40.510579+00:00"
-  },
-  "BTC/USDT:USDT": {
-    "train_timerange": "20260627-20260925",
-    "test_timerange": "20260925-20261025",
-    "params": {
-      "buy_rsi": 35,
-      "short_rsi": 55,
-      "trend_adx": 26,
-      "sl_multiplier": 2.624,
-      "tp_multiplier": 7.492
-    },
-    "metrics": {
-      "trades": 4,
-      "profit_factor": 0.0,
-      "drawdown": 0.0028605582999999797,
-      "profit_percent": -0.28605583
-    },
-    "active": false,
-    "updated_at": "2026-10-25T08:02:50.977771+00:00"
-  },
-  "SOL/USDT:USDT": {
-    "train_timerange": "20260627-20260925",
-    "test_timerange": "20260925-20261025",
-    "params": {
-      "buy_rsi": 51,
-      "short_rsi": 63,
-      "trend_adx": 26,
-      "sl_multiplier": 1.508,
-      "tp_multiplier": 3.753
+      "buy_rsi": 41,
+      "short_rsi": 58,
+      "trend_adx": 39,
+      "sl_multiplier": 3.744,
+      "tp_multiplier": 4.21
     },
     "metrics": {
       "trades": 2,
-      "profit_factor": 0.0,
-      "drawdown": 0.0015385877799999434,
-      "profit_percent": -0.153858778
+      "profit_factor": 1.2738939764790749,
+      "drawdown": 0.0013394960691873582,
+      "profit_percent": 0.036750701
     },
     "active": false,
-    "updated_at": "2026-10-25T08:03:01.853177+00:00"
+    "updated_at": "2026-11-01T10:02:50.596564+00:00"
   },
-  "ZEC/USDT:USDT": {
-    "train_timerange": "20260627-20260925",
-    "test_timerange": "20260925-20261025",
+  "BTC/USDT:USDT": {
+    "train_timerange": "20260704-20261002",
+    "test_timerange": "20261002-20261101",
     "params": {
-      "buy_rsi": 53,
-      "short_rsi": 61,
-      "trend_adx": 23,
-      "sl_multiplier": 3.7,
-      "tp_multiplier": 5.466
+      "buy_rsi": 43,
+      "short_rsi": 49,
+      "trend_adx": 22,
+      "sl_multiplier": 2.145,
+      "tp_multiplier": 7.686
     },
     "metrics": {
-      "trades": 10,
-      "profit_factor": 1.0516001608222665,
-      "drawdown": 0.012523757614272952,
-      "profit_percent": 0.09979180300000001
+      "trades": 8,
+      "profit_factor": 1.0185423517653374,
+      "drawdown": 0.0023127863650569593,
+      "profit_percent": 0.006031299999999995
     },
     "active": false,
-    "updated_at": "2026-10-25T08:03:12.743095+00:00"
+    "updated_at": "2026-11-01T10:03:09.813371+00:00"
+  },
+  "SOL/USDT:USDT": {
+    "train_timerange": "20260704-20261002",
+    "test_timerange": "20261002-20261101",
+    "params": {
+      "buy_rsi": 41,
+      "short_rsi": 60,
+      "trend_adx": 33,
+      "sl_multiplier": 3.685,
+      "tp_multiplier": 5.097
+    },
+    "metrics": {
+      "trades": 1,
+      "profit_factor": 0.0,
+      "drawdown": 0.0,
+      "profit_percent": 0.118809792
+    },
+    "active": false,
+    "updated_at": "2026-11-01T10:03:29.264569+00:00"
+  },
+  "ZEC/USDT:USDT": {
+    "train_timerange": "20260704-20261002",
+    "test_timerange": "20261002-20261101",
+    "params": {
+      "buy_rsi": 55,
+      "short_rsi": 50,
+      "trend_adx": 21,
+      "sl_multiplier": 2.971,
+      "tp_multiplier": 7.811
+    },
+    "metrics": {
+      "trades": 14,
+      "profit_factor": 0.6721503991424886,
+      "drawdown": 0.016847776228161866,
+      "profit_percent": -0.8717589249999997
+    },
+    "active": false,
+    "updated_at": "2026-11-01T10:03:47.043294+00:00"
   },
   "DOGE/USDT:USDT": {
-    "train_timerange": "20260627-20260925",
-    "test_timerange": "20260925-20261025",
+    "train_timerange": "20260704-20261002",
+    "test_timerange": "20261002-20261101",
     "params": {
       "buy_rsi": 51,
       "short_rsi": 65,
@@ -92,6 +92,6 @@
       "profit_percent": 0.158688416
     },
     "active": false,
-    "updated_at": "2026-10-25T08:03:23.642291+00:00"
+    "updated_at": "2026-11-01T10:04:04.613936+00:00"
   }
 }

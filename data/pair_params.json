@@ -1,31 +1,31 @@
 {
   "ETH/USDT:USDT": {
-    "buy_rsi": 36,
-    "short_rsi": 62,
-    "trend_adx": 26,
-    "sl_multiplier": 3.706,
-    "tp_multiplier": 3.526
+    "buy_rsi": 41,
+    "short_rsi": 58,
+    "trend_adx": 39,
+    "sl_multiplier": 3.744,
+    "tp_multiplier": 4.21
   },
   "BTC/USDT:USDT": {
-    "buy_rsi": 35,
-    "short_rsi": 55,
-    "trend_adx": 26,
-    "sl_multiplier": 2.624,
-    "tp_multiplier": 7.492
+    "buy_rsi": 43,
+    "short_rsi": 49,
+    "trend_adx": 22,
+    "sl_multiplier": 2.145,
+    "tp_multiplier": 7.686
   },
   "SOL/USDT:USDT": {
-    "buy_rsi": 51,
-    "short_rsi": 63,
-    "trend_adx": 26,
-    "sl_multiplier": 1.508,
-    "tp_multiplier": 3.753
+    "buy_rsi": 41,
+    "short_rsi": 60,
+    "trend_adx": 33,
+    "sl_multiplier": 3.685,
+    "tp_multiplier": 5.097
   },
   "ZEC/USDT:USDT": {
-    "buy_rsi": 53,
-    "short_rsi": 61,
-    "trend_adx": 23,
-    "sl_multiplier": 3.7,
-    "tp_multiplier": 5.466
+    "buy_rsi": 55,
+    "short_rsi": 50,
+    "trend_adx": 21,
+    "sl_multiplier": 2.971,
+    "tp_multiplier": 7.811
   },
   "DOGE/USDT:USDT": {
     "buy_rsi": 51,
