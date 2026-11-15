@@ -1,7 +1,26 @@
 {
+  "BTC/USDT:USDT": {
+    "train_timerange": "20260718-20261016",
+    "test_timerange": "20261016-20261115",
+    "params": {
+      "buy_rsi": 36,
+      "short_rsi": 62,
+      "trend_adx": 26,
+      "sl_multiplier": 3.706,
+      "tp_multiplier": 3.526
+    },
+    "metrics": {
+      "trades": 1,
+      "profit_factor": 0.0,
+      "drawdown": 0.00107865819999995,
+      "profit_percent": -0.10786582
+    },
+    "active": false,
+    "updated_at": "2026-11-15T10:20:25.813473+00:00"
+  },
   "ETH/USDT:USDT": {
-    "train_timerange": "20260711-20261009",
-    "test_timerange": "20261009-20261108",
+    "train_timerange": "20260718-20261016",
+    "test_timerange": "20261016-20261115",
     "params": {
       "buy_rsi": 55,
       "short_rsi": 61,
@@ -10,55 +29,17 @@
       "tp_multiplier": 5.789
     },
     "metrics": {
-      "trades": 2,
-      "profit_factor": 1.7807632256257682,
-      "drawdown": 0.001338587236230994,
-      "profit_percent": 0.10476169000000002
+      "trades": 1,
+      "profit_factor": 0.0,
+      "drawdown": 0.0013417856600000278,
+      "profit_percent": -0.134178566
     },
     "active": false,
-    "updated_at": "2026-11-08T09:50:34.219328+00:00"
-  },
-  "BTC/USDT:USDT": {
-    "train_timerange": "20260711-20261009",
-    "test_timerange": "20261009-20261108",
-    "params": {
-      "buy_rsi": 43,
-      "short_rsi": 49,
-      "trend_adx": 22,
-      "sl_multiplier": 2.145,
-      "tp_multiplier": 7.686
-    },
-    "metrics": {
-      "trades": 8,
-      "profit_factor": 0.2192307119215861,
-      "drawdown": 0.00332787701999996,
-      "profit_percent": -0.33278770199999996
-    },
-    "active": false,
-    "updated_at": "2026-11-08T09:50:44.715613+00:00"
-  },
-  "ZEC/USDT:USDT": {
-    "train_timerange": "20260711-20261009",
-    "test_timerange": "20261009-20261108",
-    "params": {
-      "buy_rsi": 55,
-      "short_rsi": 50,
-      "trend_adx": 21,
-      "sl_multiplier": 3.082,
-      "tp_multiplier": 7.811
-    },
-    "metrics": {
-      "trades": 12,
-      "profit_factor": 0.4288631854861583,
-      "drawdown": 0.014823804269999982,
-      "profit_percent": -1.4823804269999998
-    },
-    "active": false,
-    "updated_at": "2026-11-08T09:50:55.272902+00:00"
+    "updated_at": "2026-11-15T10:20:46.702816+00:00"
   },
   "SOL/USDT:USDT": {
-    "train_timerange": "20260711-20261009",
-    "test_timerange": "20261009-20261108",
+    "train_timerange": "20260718-20261016",
+    "test_timerange": "20261016-20261115",
     "params": {
       "buy_rsi": 41,
       "short_rsi": 60,
@@ -73,25 +54,44 @@
       "profit_percent": 0.118809792
     },
     "active": false,
-    "updated_at": "2026-11-08T09:51:05.003560+00:00"
+    "updated_at": "2026-11-15T10:21:04.826000+00:00"
   },
-  "XRP/USDT:USDT": {
-    "train_timerange": "20260711-20261009",
-    "test_timerange": "20261009-20261108",
+  "DOGE/USDT:USDT": {
+    "train_timerange": "20260718-20261016",
+    "test_timerange": "20261016-20261115",
     "params": {
-      "buy_rsi": 41,
-      "short_rsi": 59,
-      "trend_adx": 33,
-      "sl_multiplier": 3.685,
-      "tp_multiplier": 5.097
+      "buy_rsi": 51,
+      "short_rsi": 63,
+      "trend_adx": 30,
+      "sl_multiplier": 2.23,
+      "tp_multiplier": 2.755
     },
     "metrics": {
-      "trades": 1,
+      "trades": 2,
       "profit_factor": 0.0,
-      "drawdown": 0.001432392039999968,
-      "profit_percent": -0.143239204
+      "drawdown": 0.0,
+      "profit_percent": 0.218436664
     },
     "active": false,
-    "updated_at": "2026-11-08T09:51:14.833595+00:00"
+    "updated_at": "2026-11-15T10:21:19.747486+00:00"
+  },
+  "ZEC/USDT:USDT": {
+    "train_timerange": "20260718-20261016",
+    "test_timerange": "20261016-20261115",
+    "params": {
+      "buy_rsi": 55,
+      "short_rsi": 59,
+      "trend_adx": 30,
+      "sl_multiplier": 3.744,
+      "tp_multiplier": 6.741
+    },
+    "metrics": {
+      "trades": 4,
+      "profit_factor": 0.0,
+      "drawdown": 0.013454617950000056,
+      "profit_percent": -1.3454617949999998
+    },
+    "active": false,
+    "updated_at": "2026-11-15T10:21:42.002191+00:00"
   }
 }
